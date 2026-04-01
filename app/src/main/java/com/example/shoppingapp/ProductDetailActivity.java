@@ -62,8 +62,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         TextView tvCategory = findViewById(R.id.tvDetailCategory);
         TextView tvPrice = findViewById(R.id.tvDetailPrice);
         tvQuantity = findViewById(R.id.tvQuantity);
-        ImageButton btnMinus = findViewById(R.id.btnMinus);
-        ImageButton btnPlus = findViewById(R.id.btnPlus);
+        TextView btnMinus = findViewById(R.id.btnMinus);
+        TextView btnPlus = findViewById(R.id.btnPlus);
         TextView btnAddToCart = findViewById(R.id.btnAddToCart);
         ImageButton btnBack = findViewById(R.id.btnBack);
 

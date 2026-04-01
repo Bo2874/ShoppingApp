@@ -60,6 +60,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     .load(product.getImageUrl())
                     .transform(new CenterCrop(), new RoundedCorners(12))
                     .placeholder(R.drawable.ic_placeholder)
+                    .error(R.drawable.ic_placeholder)
                     .into(holder.ivProduct);
         }
 
@@ -88,7 +89,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivProduct;
         TextView tvName, tvPrice, tvQuantity, tvSubtotal;
-        ImageButton btnMinus, btnPlus, btnDelete;
+        TextView btnMinus, btnPlus;
+        ImageButton btnDelete;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
