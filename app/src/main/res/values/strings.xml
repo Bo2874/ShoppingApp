@@ -1,3 +1,29 @@
 <resources>
-    <string name="app_name">ShoppingApp</string>
+    <string name="app_name">FreshMart</string>
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_category">Danh mục</string>
+    <string name="nav_cart">Giỏ hàng</string>
+    <string name="nav_profile">Tài khoản</string>
+    <string name="search_hint">Tìm kiếm rau củ quả\u2026</string>
+    <string name="banner_title">Rau củ tươi mỗi ngày</string>
+    <string name="banner_subtitle">100%% hữu cơ, giao hàng trong 3 giờ</string>
+    <string name="shop_now">Mua ngay</string>
+    <string name="categories_title">Danh mục</string>
+    <string name="featured_products">Sản phẩm nổi bật</string>
+    <string name="see_all">Xem tất cả</string>
+    <string name="add_to_cart">Thêm vào giỏ hàng</string>
+    <string name="login">Đăng nhập</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="username_hint">Tên đăng nhập</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="checkout">Thanh toán</string>
+    <string name="continue_shopping">Tiếp tục mua</string>
+    <string name="total">Tổng cộng</string>
+    <string name="invoice_title">Hóa đơn</string>
+    <string name="back_home">Về trang chủ</string>
+    <string name="quantity">Số lượng</string>
+    <string name="cart_empty">Giỏ hàng trống</string>
+    <string name="login_required">Vui lòng đăng nhập để mua hàng</string>
+    <string name="welcome">Chào mừng bạn!</string>
+    <string name="order_history">Lịch sử đơn hàng</string>
 </resources>
