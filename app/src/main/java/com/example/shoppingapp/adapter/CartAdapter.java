@@ -1,5 +1,6 @@
 package com.example.shoppingapp.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,13 +52,23 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         OrderDetail item = items.get(position);
         Product product = productMap.get(item.getProductId());
+        Context context = holder.itemView.getContext();
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
 
         if (product != null) {
             holder.tvName.setText(product.getName());
             holder.tvPrice.setText(formatter.format(product.getPrice()) + "đ/" + product.getUnit());
-            Glide.with(holder.itemView.getContext())
-                    .load(product.getImageUrl())
+            
+            // Logic load ảnh nội bộ cho Cart
+            Object imageSource = product.getImageUrl();
+            if (product.getImageUrl() != null && product.getImageUrl().startsWith("res://drawable/")) {
+                String resName = product.getImageUrl().replace("res://drawable/", "");
+                int resId = context.getResources().getIdentifier(resName, "drawable", context.getPackageName());
+                if (resId != 0) imageSource = resId;
+            }
+
+            Glide.with(context)
+                    .load(imageSource)
                     .transform(new CenterCrop(), new RoundedCorners(12))
                     .placeholder(R.drawable.ic_placeholder)
                     .error(R.drawable.ic_placeholder)

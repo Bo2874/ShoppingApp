@@ -1,21 +1,21 @@
 package com.example.shoppingapp;
 
 import android.os.Bundle;
-import android.util.Patterns;
-import android.widget.EditText;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.textfield.TextInputLayout;
 import com.example.shoppingapp.database.AppDatabase;
 import com.example.shoppingapp.database.entity.User;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText etFullName, etEmail, etPhone, etUsername, etPassword, etConfirmPassword;
-    private TextInputLayout tilFullName, tilEmail, tilPhone, tilUsername, tilPassword, tilConfirmPassword;
+    private TextInputEditText etFullName, etUsername, etPassword, etPhone;
+    private TextInputLayout tilFullName, tilUsername, tilPassword, tilPhone;
     private AppDatabase db;
 
     @Override
@@ -25,120 +25,76 @@ public class RegisterActivity extends AppCompatActivity {
 
         db = AppDatabase.getInstance(this);
 
+        // TextInputLayouts
         tilFullName = findViewById(R.id.tilFullName);
-        tilEmail = findViewById(R.id.tilEmail);
         tilPhone = findViewById(R.id.tilPhone);
         tilUsername = findViewById(R.id.tilUsername);
         tilPassword = findViewById(R.id.tilPassword);
-        tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
 
+        // TextInputEditTexts
         etFullName = findViewById(R.id.etFullName);
-        etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
-        etConfirmPassword = findViewById(R.id.etConfirmPassword);
 
-        TextView btnRegister = findViewById(R.id.btnRegister);
-        TextView tvGoLogin = findViewById(R.id.tvGoLogin);
+        Button btnRegister = findViewById(R.id.btnRegister);
+        TextView tvLoginLink = findViewById(R.id.tvLoginLink);
 
         btnRegister.setOnClickListener(v -> doRegister());
-        tvGoLogin.setOnClickListener(v -> finish());
-    }
-
-    private void clearErrors() {
-        tilFullName.setError(null);
-        tilEmail.setError(null);
-        tilPhone.setError(null);
-        tilUsername.setError(null);
-        tilPassword.setError(null);
-        tilConfirmPassword.setError(null);
+        tvLoginLink.setOnClickListener(v -> finish());
     }
 
     private void doRegister() {
-        clearErrors();
-
         String fullName = etFullName.getText().toString().trim();
-        String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
         String username = etUsername.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
-        String confirmPassword = etConfirmPassword.getText().toString().trim();
 
         boolean hasError = false;
 
-        // Full name
         if (fullName.isEmpty()) {
             tilFullName.setError("Vui lòng nhập họ tên");
             hasError = true;
-        } else if (fullName.length() < 2) {
-            tilFullName.setError("Họ tên phải có ít nhất 2 ký tự");
-            hasError = true;
+        } else {
+            tilFullName.setError(null);
         }
 
-        // Email
-        if (email.isEmpty()) {
-            tilEmail.setError("Vui lòng nhập email");
+        if (phone.length() < 10) {
+            tilPhone.setError("Số điện thoại không hợp lệ");
             hasError = true;
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            tilEmail.setError("Email không hợp lệ (ví dụ: abc@gmail.com)");
-            hasError = true;
+        } else {
+            tilPhone.setError(null);
         }
 
-        // Phone
-        if (phone.isEmpty()) {
-            tilPhone.setError("Vui lòng nhập số điện thoại");
+        if (username.length() < 3) {
+            tilUsername.setError("Tên đăng nhập quá ngắn");
             hasError = true;
-        } else if (!phone.matches("^0\\d{9,10}$")) {
-            tilPhone.setError("SĐT phải bắt đầu bằng 0, gồm 10-11 chữ số");
-            hasError = true;
+        } else {
+            tilUsername.setError(null);
         }
 
-        // Username
-        if (username.isEmpty()) {
-            tilUsername.setError("Vui lòng nhập tên đăng nhập");
+        if (password.length() < 6) {
+            tilPassword.setError("Mật khẩu phải ít nhất 6 ký tự");
             hasError = true;
-        } else if (username.length() < 3) {
-            tilUsername.setError("Tên đăng nhập phải có ít nhất 3 ký tự");
-            hasError = true;
-        } else if (!username.matches("[a-zA-Z0-9]+")) {
-            tilUsername.setError("Chỉ được dùng chữ cái và số, không có khoảng trắng");
-            hasError = true;
-        }
-
-        // Password
-        if (password.isEmpty()) {
-            tilPassword.setError("Vui lòng nhập mật khẩu");
-            hasError = true;
-        } else if (password.length() < 6) {
-            tilPassword.setError("Mật khẩu phải có ít nhất 6 ký tự");
-            hasError = true;
-        }
-
-        // Confirm password
-        if (confirmPassword.isEmpty()) {
-            tilConfirmPassword.setError("Vui lòng xác nhận mật khẩu");
-            hasError = true;
-        } else if (!confirmPassword.equals(password)) {
-            tilConfirmPassword.setError("Mật khẩu xác nhận không khớp");
-            hasError = true;
+        } else {
+            tilPassword.setError(null);
         }
 
         if (hasError) return;
 
         AppDatabase.databaseExecutor.execute(() -> {
+            // Check if user exists
             User existing = db.userDao().getUserByUsername(username);
             if (existing != null) {
-                runOnUiThread(() -> tilUsername.setError("Tên đăng nhập đã tồn tại, vui lòng chọn tên khác"));
+                runOnUiThread(() -> Toast.makeText(this, "Tên đăng nhập đã tồn tại", Toast.LENGTH_SHORT).show());
                 return;
             }
 
-            User user = new User(username, password, fullName, phone);
-            user.setEmail(email);
-            db.userDao().insert(user);
+            User newUser = new User(username, password, fullName, phone);
+            db.userDao().insert(newUser);
 
             runOnUiThread(() -> {
-                Toast.makeText(this, "Đăng ký thành công! Vui lòng đăng nhập.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
                 finish();
             });
         });

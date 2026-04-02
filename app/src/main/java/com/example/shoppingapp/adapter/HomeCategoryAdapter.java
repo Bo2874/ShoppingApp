@@ -1,5 +1,6 @@
 package com.example.shoppingapp.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,20 +42,29 @@ public class HomeCategoryAdapter extends RecyclerView.Adapter<HomeCategoryAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Category category = categories.get(position);
+        Context context = holder.itemView.getContext();
         holder.tvName.setText(category.getName());
 
-        Glide.with(holder.itemView.getContext())
-                .load(category.getImageUrl())
+        // Logic load ảnh từ resource string
+        Object imageSource = category.getImageUrl();
+        if (category.getImageUrl() != null && category.getImageUrl().startsWith("res://drawable/")) {
+            String resName = category.getImageUrl().replace("res://drawable/", "");
+            int resId = context.getResources().getIdentifier(resName, "drawable", context.getPackageName());
+            if (resId != 0) imageSource = resId;
+        }
+
+        Glide.with(context)
+                .load(imageSource)
                 .placeholder(R.drawable.ic_category)
                 .error(R.drawable.ic_category)
                 .into(holder.ivIcon);
 
         if (position == selectedPosition) {
             holder.itemView.setBackgroundResource(R.drawable.bg_category_chip_selected);
-            holder.tvName.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.white, null));
+            holder.tvName.setTextColor(context.getResources().getColor(R.color.white, null));
         } else {
             holder.itemView.setBackgroundResource(R.drawable.bg_category_chip);
-            holder.tvName.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.text_primary, null));
+            holder.tvName.setTextColor(context.getResources().getColor(R.color.text_primary, null));
         }
 
         holder.itemView.setOnClickListener(v -> {

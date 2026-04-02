@@ -2,6 +2,7 @@ package com.example.shoppingapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,12 +28,12 @@ public class LoginActivity extends AppCompatActivity {
 
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
-        TextView btnLogin = findViewById(R.id.btnLogin);
-        TextView tvGoRegister = findViewById(R.id.tvGoRegister);
+        Button btnLogin = findViewById(R.id.btnLogin);
+        TextView tvRegisterLink = findViewById(R.id.tvRegisterLink);
 
         btnLogin.setOnClickListener(v -> doLogin());
 
-        tvGoRegister.setOnClickListener(v ->
+        tvRegisterLink.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class)));
     }
 

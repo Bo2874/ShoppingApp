@@ -24,7 +24,7 @@ import com.example.shoppingapp.database.entity.User;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {User.class, Category.class, Product.class, Order.class, OrderDetail.class, Favorite.class}, version = 8, exportSchema = false)
+@Database(entities = {User.class, Category.class, Product.class, Order.class, OrderDetail.class, Favorite.class}, version = 9, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract UserDao userDao();
@@ -86,116 +86,115 @@ public abstract class AppDatabase extends RoomDatabase {
 
                 // === Seed Categories ===
                 CategoryDao categoryDao = database.categoryDao();
-                categoryDao.insert(new Category("Sneakers", "Giày thể thao thời trang", "https://cdn-icons-png.flaticon.com/128/2589/2589903.png"));
-                categoryDao.insert(new Category("Running", "Giày chạy bộ chuyên dụng", "https://cdn-icons-png.flaticon.com/128/2589/2589920.png"));
-                categoryDao.insert(new Category("Basketball", "Giày bóng rổ cao cấp", "https://cdn-icons-png.flaticon.com/128/3163/3163038.png"));
-                categoryDao.insert(new Category("Casual", "Giày đi hàng ngày thoải mái", "https://cdn-icons-png.flaticon.com/128/2589/2589910.png"));
-                categoryDao.insert(new Category("Boots", "Giày boot cá tính", "https://cdn-icons-png.flaticon.com/128/2310/2310760.png"));
+                categoryDao.insert(new Category("Sneakers", "Giày thể thao thời trang", "res://drawable/cat_sneakers"));
+                categoryDao.insert(new Category("Running", "Giày chạy bộ chuyên dụng", "res://drawable/cat_running"));
+                categoryDao.insert(new Category("Basketball", "Giày bóng rổ cao cấp", "res://drawable/cat_basketball"));
+                categoryDao.insert(new Category("Casual", "Giày đi hàng ngày thoải mái", "res://drawable/cat_casual"));
+                categoryDao.insert(new Category("Boots", "Giày boot cá tính", "res://drawable/cat_boots"));
 
                 // === Seed Products ===
-                // Thay URL ảnh bên dưới bằng link ảnh thật của từng sản phẩm
                 ProductDao productDao = database.productDao();
                 Product p;
 
                 // Sneakers (categoryId = 1)
-                p = new Product("Air Max 90", "Nike", "Giày Nike Air Max 90 mang phong cách cổ điển với đệm Air Max ở gót chân, đế ngoài waffle bền bỉ.", 2890000, "https://picsum.photos/seed/airmax90/400/400", "đôi", 1);
+                p = new Product("Air Max 90", "Nike", "Giày Nike Air Max 90 mang phong cách cổ điển với đệm Air Max ở gót chân, đế ngoài waffle bền bỉ.", 2890000, "res://drawable/prod_air_max_90", "đôi", 1);
                 p.setSizes("38,39,40,41,42,43");
                 p.setRating(4.8f);
                 p.setReviewCount(234);
                 productDao.insert(p);
 
-                p = new Product("Superstar", "Adidas", "Adidas Superstar - biểu tượng đường phố từ thập niên 70. Mũi giày vỏ sò đặc trưng.", 2190000, "https://picsum.photos/seed/superstar/400/400", "đôi", 1);
+                p = new Product("Superstar", "Adidas", "Adidas Superstar - biểu tượng đường phố từ thập niên 70. Mũi giày vỏ sò đặc trưng.", 2190000, "res://drawable/prod_superstar", "đôi", 1);
                 p.setSizes("39,40,41,42,43");
                 p.setRating(4.6f);
                 p.setReviewCount(189);
                 productDao.insert(p);
 
-                p = new Product("Old Skool", "Vans", "Vans Old Skool - giày skate huyền thoại với sọc Jazz Stripe nổi bật.", 1690000, "https://picsum.photos/seed/oldskool/400/400", "đôi", 1);
+                p = new Product("Old Skool", "Vans", "Vans Old Skool - giày skate huyền thoại với sọc Jazz Stripe nổi bật.", 1690000, "res://drawable/prod_old_skool", "đôi", 1);
                 p.setSizes("38,39,40,41,42,43,44");
                 p.setRating(4.5f);
                 p.setReviewCount(312);
                 productDao.insert(p);
 
-                p = new Product("Chuck Taylor", "Converse", "Converse Chuck Taylor All Star - đôi giày kinh điển nhất mọi thời đại.", 1490000, "https://picsum.photos/seed/chucktaylor/400/400", "đôi", 1);
+                p = new Product("Chuck Taylor", "Converse", "Converse Chuck Taylor All Star - đôi giày kinh điển nhất mọi thời đại.", 1490000, "res://drawable/prod_chuck_taylor", "đôi", 1);
                 p.setSizes("37,38,39,40,41,42,43");
                 p.setRating(4.7f);
                 p.setReviewCount(456);
                 productDao.insert(p);
 
                 // Running (categoryId = 2)
-                p = new Product("Ultraboost Light", "Adidas", "Adidas Ultraboost Light - công nghệ BOOST mang lại cảm giác đàn hồi tuyệt vời.", 4290000, "https://picsum.photos/seed/ultraboost/400/400", "đôi", 2);
+                p = new Product("Ultraboost Light", "Adidas", "Adidas Ultraboost Light - công nghệ BOOST mang lại cảm giác đàn hồi tuyệt vời.", 4290000, "res://drawable/prod_ultraboost_light", "đôi", 2);
                 p.setOriginalPrice(5290000);
                 p.setSizes("39,40,41,42,43,44");
                 p.setRating(4.9f);
                 p.setReviewCount(178);
                 productDao.insert(p);
 
-                p = new Product("Pegasus 40", "Nike", "Nike Pegasus 40 - đôi giày chạy đáng tin cậy nhất. Zoom Air êm ái.", 3190000, "https://picsum.photos/seed/pegasus40/400/400", "đôi", 2);
+                p = new Product("Pegasus 40", "Nike", "Nike Pegasus 40 - đôi giày chạy đáng tin cậy nhất. Zoom Air êm ái.", 3190000, "res://drawable/prod_pegasus_40", "đôi", 2);
                 p.setSizes("39,40,41,42,43");
                 p.setRating(4.7f);
                 p.setReviewCount(267);
                 productDao.insert(p);
 
-                p = new Product("Fresh Foam 1080", "New Balance", "New Balance 1080v13 - đệm Fresh Foam X dày dặn, hoàn hảo cho chạy đường dài.", 3890000, "https://picsum.photos/seed/freshfoam/400/400", "đôi", 2);
+                p = new Product("Fresh Foam 1080", "New Balance", "New Balance 1080v13 - đệm Fresh Foam X dày dặn, hoàn hảo cho chạy đường dài.", 3890000, "res://drawable/prod_fresh_foam_1080", "đôi", 2);
                 p.setSizes("40,41,42,43,44");
                 p.setRating(4.8f);
                 p.setReviewCount(145);
                 productDao.insert(p);
 
                 // Basketball (categoryId = 3)
-                p = new Product("LeBron XXI", "Nike", "Nike LeBron 21 - công nghệ Zoom Air kép cho khả năng bật nhảy vượt trội.", 5490000, "https://picsum.photos/seed/lebron21/400/400", "đôi", 3);
+                p = new Product("LeBron XXI", "Nike", "Nike LeBron 21 - công nghệ Zoom Air kép cho khả năng bật nhảy vượt trội.", 5490000, "res://drawable/prod_lebron_21", "đôi", 3);
                 p.setOriginalPrice(6490000);
                 p.setSizes("40,41,42,43,44,45");
                 p.setRating(4.9f);
                 p.setReviewCount(89);
                 productDao.insert(p);
 
-                p = new Product("Curry 11", "Under Armour", "Under Armour Curry 11 - nhẹ nhàng, linh hoạt với UA Flow.", 4290000, "https://picsum.photos/seed/curry11/400/400", "đôi", 3);
+                p = new Product("Curry 11", "Under Armour", "Under Armour Curry 11 - nhẹ nhàng, linh hoạt với UA Flow.", 4290000, "res://drawable/prod_curry_11", "đôi", 3);
                 p.setSizes("40,41,42,43,44");
                 p.setRating(4.6f);
                 p.setReviewCount(67);
                 productDao.insert(p);
 
-                p = new Product("Harden Vol. 8", "Adidas", "Adidas Harden Vol. 8 - Boost cushioning cho bước di chuyển tự tin.", 3790000, "https://picsum.photos/seed/harden8/400/400", "đôi", 3);
+                p = new Product("Harden Vol. 8", "Adidas", "Adidas Harden Vol. 8 - Boost cushioning cho bước di chuyển tự tin.", 3790000, "res://drawable/prod_harden_8", "đôi", 3);
                 p.setSizes("40,41,42,43,44,45");
                 p.setRating(4.5f);
                 p.setReviewCount(54);
                 productDao.insert(p);
 
                 // Casual (categoryId = 4)
-                p = new Product("Stan Smith", "Adidas", "Adidas Stan Smith - thiết kế tối giản, thanh lịch. Da premium mềm mại.", 2490000, "https://picsum.photos/seed/stansmith/400/400", "đôi", 4);
+                p = new Product("Stan Smith", "Adidas", "Adidas Stan Smith - thiết kế tối giản, thanh lịch. Da premium mềm mại.", 2490000, "res://drawable/prod_stan_smith", "đôi", 4);
                 p.setSizes("37,38,39,40,41,42,43");
                 p.setRating(4.7f);
                 p.setReviewCount(523);
                 productDao.insert(p);
 
-                p = new Product("Gazelle", "Adidas", "Adidas Gazelle - phong cách retro từ thập niên 90, da lộn mềm, đế gum classic.", 2290000, "https://picsum.photos/seed/gazelle/400/400", "đôi", 4);
+                p = new Product("Gazelle", "Adidas", "Adidas Gazelle - phong cách retro từ thập niên 90, da lộn mềm, đế gum classic.", 2290000, "res://drawable/prod_gazelle", "đôi", 4);
                 p.setOriginalPrice(2690000);
                 p.setSizes("38,39,40,41,42,43");
                 p.setRating(4.6f);
                 p.setReviewCount(287);
                 productDao.insert(p);
 
-                p = new Product("Club C 85", "Reebok", "Reebok Club C 85 - giày tennis cổ điển, da mềm trắng tinh.", 1890000, "https://picsum.photos/seed/clubc85/400/400", "đôi", 4);
+                p = new Product("Club C 85", "Reebok", "Reebok Club C 85 - giày tennis cổ điển, da mềm trắng tinh.", 1890000, "res://drawable/prod_club_c_85", "đôi", 4);
                 p.setSizes("38,39,40,41,42,43");
                 p.setRating(4.4f);
                 p.setReviewCount(198);
                 productDao.insert(p);
 
                 // Boots (categoryId = 5)
-                p = new Product("6-Inch Premium", "Timberland", "Timberland 6-Inch Premium - biểu tượng boot vượt thời gian. Da nubuck chống nước.", 4890000, "https://picsum.photos/seed/timberland/400/400", "đôi", 5);
+                p = new Product("6-Inch Premium", "Timberland", "Timberland 6-Inch Premium - biểu tượng boot vượt thời gian. Da nubuck chống nước.", 4890000, "res://drawable/prod_timberland_6inch", "đôi", 5);
                 p.setSizes("39,40,41,42,43,44");
                 p.setRating(4.8f);
                 p.setReviewCount(345);
                 productDao.insert(p);
 
-                p = new Product("1460 Smooth", "Dr. Martens", "Dr. Martens 1460 - 8 lỗ xỏ dây kinh điển. Da Smooth bóng, đế AirWair đàn hồi.", 4290000, "https://picsum.photos/seed/drmartens/400/400", "đôi", 5);
+                p = new Product("1460 Smooth", "Dr. Martens", "Dr. Martens 1460 - 8 lỗ xỏ dây kinh điển. Da Smooth bóng, đế AirWair đàn hồi.", 4290000, "res://drawable/prod_dr_martens_1460", "đôi", 5);
                 p.setSizes("38,39,40,41,42,43");
                 p.setRating(4.7f);
                 p.setReviewCount(267);
                 productDao.insert(p);
 
-                p = new Product("Chelsea Boot", "Dr. Martens", "Dr. Martens 2976 Chelsea Boot - thiết kế slip-on tiện lợi, da nappa mềm.", 3990000, "https://picsum.photos/seed/chelsea/400/400", "đôi", 5);
+                p = new Product("Chelsea Boot", "Dr. Martens", "Dr. Martens 2976 Chelsea Boot - thiết kế slip-on tiện lợi, da nappa mềm.", 3990000, "res://drawable/prod_chelsea_boot", "đôi", 5);
                 p.setOriginalPrice(4590000);
                 p.setSizes("38,39,40,41,42,43");
                 p.setRating(4.6f);

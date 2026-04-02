@@ -1,5 +1,6 @@
 package com.example.shoppingapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -49,13 +50,24 @@ public class CategoryListActivity extends AppCompatActivity {
             @Override
             public void onBindViewHolder(@NonNull CatViewHolder holder, int position) {
                 Category cat = categories.get(position);
+                Context context = holder.itemView.getContext();
                 holder.tvName.setText(cat.getName());
                 holder.tvDesc.setText(cat.getDescription());
-                Glide.with(holder.itemView.getContext())
-                        .load(cat.getImageUrl())
+
+                // Xử lý load ảnh từ resource nội bộ res://drawable/
+                Object imageSource = cat.getImageUrl();
+                if (cat.getImageUrl() != null && cat.getImageUrl().startsWith("res://drawable/")) {
+                    String resName = cat.getImageUrl().replace("res://drawable/", "");
+                    int resId = context.getResources().getIdentifier(resName, "drawable", context.getPackageName());
+                    if (resId != 0) imageSource = resId;
+                }
+
+                Glide.with(context)
+                        .load(imageSource)
                         .placeholder(R.drawable.ic_category)
                         .error(R.drawable.ic_category)
                         .into(holder.ivImage);
+
                 holder.itemView.setOnClickListener(v -> {
                     Intent intent = new Intent(CategoryListActivity.this, ProductListActivity.class);
                     intent.putExtra("categoryId", cat.getId());

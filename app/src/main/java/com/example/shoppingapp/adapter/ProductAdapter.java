@@ -1,5 +1,6 @@
 package com.example.shoppingapp.adapter;
 
+import android.content.Context;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,15 +53,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         notifyDataSetChanged();
     }
 
-    public int getViewType() {
-        return viewType;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return viewType;
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -72,18 +64,17 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Product product = products.get(position);
+        Context context = holder.itemView.getContext();
+        
         holder.tvName.setText(product.getName());
 
-        // Brand
         if (holder.tvBrand != null) {
             holder.tvBrand.setText(product.getBrand());
         }
 
-        // Price formatted Vietnamese locale
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
         holder.tvPrice.setText(formatter.format(product.getPrice()) + "đ");
 
-        // Sale badge and original price
         if (product.isOnSale()) {
             if (holder.tvOriginalPrice != null) {
                 holder.tvOriginalPrice.setVisibility(View.VISIBLE);
@@ -100,25 +91,29 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             if (holder.tvSaleBadge != null) holder.tvSaleBadge.setVisibility(View.GONE);
         }
 
-        // Rating
         if (holder.tvRating != null) {
             holder.tvRating.setText(String.valueOf(product.getRating()));
         }
 
-        // Description (list view only)
         if (holder.tvDescription != null) {
             holder.tvDescription.setText(product.getDescription());
         }
 
-        // Image
-        Glide.with(holder.itemView.getContext())
-                .load(product.getImageUrl())
+        // Logic load ảnh sửa lại ở đây
+        Object imageSource = product.getImageUrl();
+        if (product.getImageUrl() != null && product.getImageUrl().startsWith("res://drawable/")) {
+            String resName = product.getImageUrl().replace("res://drawable/", "");
+            int resId = context.getResources().getIdentifier(resName, "drawable", context.getPackageName());
+            if (resId != 0) imageSource = resId;
+        }
+
+        Glide.with(context)
+                .load(imageSource)
                 .transform(new CenterCrop(), new RoundedCorners(16))
                 .placeholder(R.drawable.ic_placeholder)
                 .error(R.drawable.ic_placeholder)
                 .into(holder.ivProduct);
 
-        // Favorite Heart Icon
         if (holder.ivHeart != null) {
             if (favoriteProductIds.contains(product.getId())) {
                 holder.ivHeart.setImageResource(R.drawable.ic_heart_filled);

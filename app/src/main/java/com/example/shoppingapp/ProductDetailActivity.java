@@ -42,6 +42,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private String selectedSize = null;
     private boolean isFavorite = false;
     private ImageView btnFavorite;
+    private ProductAdapter relatedAdapter;
 
     private final ActivityResultLauncher<Intent> loginLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -146,13 +147,16 @@ public class ProductDetailActivity extends AppCompatActivity {
                 return;
             }
 
+            List<Integer> favoriteIds = new ArrayList<>();
             if (sessionManager.isLoggedIn()) {
                 isFavorite = db.favoriteDao().isFavorite(sessionManager.getUserId(), productId);
+                favoriteIds = db.favoriteDao().getFavoriteProductIds(sessionManager.getUserId());
             }
 
             List<Product> relatedProducts = db.productDao().getRelatedProducts(
                     product.getCategoryId(), product.getId(), 4);
 
+            List<Integer> finalFavoriteIds = favoriteIds;
             runOnUiThread(() -> {
                 tvName.setText(product.getName());
                 tvDescription.setText(product.getDescription());
@@ -163,8 +167,16 @@ public class ProductDetailActivity extends AppCompatActivity {
                 NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
                 tvPrice.setText(formatter.format(product.getPrice()) + "đ");
 
+                // --- Xử lý load ảnh nội bộ ---
+                Object imageSource = product.getImageUrl();
+                if (product.getImageUrl() != null && product.getImageUrl().startsWith("res://drawable/")) {
+                    String resName = product.getImageUrl().replace("res://drawable/", "");
+                    int resId = getResources().getIdentifier(resName, "drawable", getPackageName());
+                    if (resId != 0) imageSource = resId;
+                }
+
                 Glide.with(this)
-                        .load(product.getImageUrl())
+                        .load(imageSource)
                         .placeholder(R.drawable.ic_placeholder)
                         .error(R.drawable.ic_placeholder)
                         .into(ivProduct);
@@ -209,12 +221,14 @@ public class ProductDetailActivity extends AppCompatActivity {
                     layoutRelated.setVisibility(View.VISIBLE);
                     rvRelated.setLayoutManager(new GridLayoutManager(this, 2));
                     rvRelated.setNestedScrollingEnabled(false);
-                    rvRelated.setAdapter(new ProductAdapter(new ArrayList<>(relatedProducts), p -> {
+                    relatedAdapter = new ProductAdapter(new ArrayList<>(relatedProducts), p -> {
                         Intent intent = new Intent(this, ProductDetailActivity.class);
                         intent.putExtra("productId", p.getId());
                         startActivity(intent);
                         finish();
-                    }));
+                    });
+                    relatedAdapter.setFavoriteProductIds(finalFavoriteIds);
+                    rvRelated.setAdapter(relatedAdapter);
                 }
             });
         });
