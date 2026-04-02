@@ -3,6 +3,8 @@ package com.example.shoppingapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,22 +44,32 @@ public class InvoiceActivity extends AppCompatActivity {
         orderId = getIntent().getIntExtra("orderId", -1);
 
         if (orderId == -1) {
-            Toast.makeText(this, "Không tìm thấy hóa đơn", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Không tìm thấy đơn hàng", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
+        // Views
+        ImageButton btnBackToolbar = findViewById(R.id.btnBackToolbar);
         TextView tvInvoiceId = findViewById(R.id.tvInvoiceId);
         TextView tvInvoiceDate = findViewById(R.id.tvInvoiceDate);
         TextView tvInvoiceCustomer = findViewById(R.id.tvInvoiceCustomer);
+        TextView tvInvoicePhone = findViewById(R.id.tvInvoicePhone);
+        TextView tvInvoiceEmail = findViewById(R.id.tvInvoiceEmail);
         TextView tvInvoiceAddress = findViewById(R.id.tvInvoiceAddress);
         TextView tvInvoicePayment = findViewById(R.id.tvInvoicePayment);
         TextView tvInvoiceStatus = findViewById(R.id.tvInvoiceStatus);
         TextView tvInvoiceTotal = findViewById(R.id.tvInvoiceTotal);
+        LinearLayout rowPhone = findViewById(R.id.rowPhone);
+        LinearLayout rowEmail = findViewById(R.id.rowEmail);
+        LinearLayout rowAddress = findViewById(R.id.rowAddress);
+        LinearLayout rowPayment = findViewById(R.id.rowPayment);
         RecyclerView rv = findViewById(R.id.rvInvoiceItems);
         rv.setLayoutManager(new LinearLayoutManager(this));
         TextView btnBackHome = findViewById(R.id.btnBackHome);
         TextView btnReorder = findViewById(R.id.btnReorder);
+
+        btnBackToolbar.setOnClickListener(v -> finish());
 
         btnBackHome.setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
@@ -68,11 +80,12 @@ public class InvoiceActivity extends AppCompatActivity {
 
         btnReorder.setOnClickListener(v -> reorder());
 
+        // Load data
         AppDatabase.databaseExecutor.execute(() -> {
             Order order = db.orderDao().getOrderById(orderId);
             if (order == null) {
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "Không tìm thấy hóa đơn", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Không tìm thấy đơn hàng", Toast.LENGTH_SHORT).show();
                     finish();
                 });
                 return;
@@ -89,32 +102,47 @@ public class InvoiceActivity extends AppCompatActivity {
             NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
 
             runOnUiThread(() -> {
-                tvInvoiceId.setText("Mã đơn hàng: #" + order.getId());
-                tvInvoiceDate.setText("Ngày: " + order.getOrderDate());
-                String customerInfo = "Khách hàng: " + (user != null ? user.getFullName() : "N/A");
-                if (user != null && user.getPhone() != null && !user.getPhone().isEmpty()) {
-                    customerInfo += "\nSĐT: " + user.getPhone();
-                }
-                if (user != null && user.getEmail() != null && !user.getEmail().isEmpty()) {
-                    customerInfo += "\nEmail: " + user.getEmail();
-                }
-                tvInvoiceCustomer.setText(customerInfo);
-                String statusText;
-                switch (order.getStatus()) {
-                    case "Paid": statusText = "Đã thanh toán"; break;
-                    case "Delivering": statusText = "Đang giao hàng"; break;
-                    default: statusText = order.getStatus();
-                }
-                tvInvoiceStatus.setText(statusText);
+                tvInvoiceId.setText("#" + order.getId());
+                tvInvoiceDate.setText(order.getOrderDate());
+                tvInvoiceCustomer.setText(user != null ? user.getFullName() : "N/A");
                 tvInvoiceTotal.setText(formatter.format(order.getTotalAmount()) + "đ");
 
-                // Show address if available
-                if (order.getAddress() != null && !order.getAddress().isEmpty()) {
-                    tvInvoiceAddress.setText("Địa chỉ: " + order.getAddress());
-                    tvInvoiceAddress.setVisibility(View.VISIBLE);
+                // Status badge
+                String statusText;
+                switch (order.getStatus()) {
+                    case "Paid":
+                        statusText = "Đã thanh toán";
+                        tvInvoiceStatus.setBackgroundResource(R.drawable.bg_status_badge);
+                        break;
+                    case "Delivering":
+                        statusText = "Đang giao hàng";
+                        tvInvoiceStatus.setBackgroundResource(R.drawable.bg_status_delivering);
+                        break;
+                    default:
+                        statusText = order.getStatus();
+                        tvInvoiceStatus.setBackgroundResource(R.drawable.bg_status_badge);
+                }
+                tvInvoiceStatus.setText(statusText);
+
+                // Phone
+                if (user != null && user.getPhone() != null && !user.getPhone().isEmpty()) {
+                    tvInvoicePhone.setText(user.getPhone());
+                    rowPhone.setVisibility(View.VISIBLE);
                 }
 
-                // Show payment method if available
+                // Email
+                if (user != null && user.getEmail() != null && !user.getEmail().isEmpty()) {
+                    tvInvoiceEmail.setText(user.getEmail());
+                    rowEmail.setVisibility(View.VISIBLE);
+                }
+
+                // Address
+                if (order.getAddress() != null && !order.getAddress().isEmpty()) {
+                    tvInvoiceAddress.setText(order.getAddress());
+                    rowAddress.setVisibility(View.VISIBLE);
+                }
+
+                // Payment method
                 if (order.getPaymentMethod() != null && !order.getPaymentMethod().isEmpty()) {
                     String paymentLabel;
                     switch (order.getPaymentMethod()) {
@@ -123,12 +151,11 @@ public class InvoiceActivity extends AppCompatActivity {
                         case "EWallet": paymentLabel = "Ví điện tử"; break;
                         default: paymentLabel = order.getPaymentMethod();
                     }
-                    tvInvoicePayment.setText("Thanh toán: " + paymentLabel);
-                    tvInvoicePayment.setVisibility(View.VISIBLE);
+                    tvInvoicePayment.setText(paymentLabel);
+                    rowPayment.setVisibility(View.VISIBLE);
                 }
 
-                OrderDetailAdapter adapter = new OrderDetailAdapter(details, productMap);
-                rv.setAdapter(adapter);
+                rv.setAdapter(new OrderDetailAdapter(details, productMap));
             });
         });
     }
@@ -143,18 +170,15 @@ public class InvoiceActivity extends AppCompatActivity {
             int userId = sessionManager.getUserId();
             List<OrderDetail> oldDetails = db.orderDetailDao().getOrderDetailsByOrderId(orderId);
 
-            // Get or create pending order
             Order pendingOrder = db.orderDao().getPendingOrder(userId);
             int newOrderId;
             if (pendingOrder == null) {
                 String date = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date());
-                Order newOrder = new Order(userId, date, 0, "Pending");
-                newOrderId = (int) db.orderDao().insert(newOrder);
+                newOrderId = (int) db.orderDao().insert(new Order(userId, date, 0, "Pending"));
             } else {
                 newOrderId = pendingOrder.getId();
             }
 
-            // Add items from old order
             for (OrderDetail old : oldDetails) {
                 Product product = db.productDao().getProductById(old.getProductId());
                 if (product == null) continue;
@@ -164,12 +188,10 @@ public class InvoiceActivity extends AppCompatActivity {
                     int newQty = Math.min(existing.getQuantity() + old.getQuantity(), 99);
                     db.orderDetailDao().setQuantity(existing.getId(), newQty);
                 } else {
-                    OrderDetail detail = new OrderDetail(newOrderId, old.getProductId(), old.getQuantity(), product.getPrice());
-                    db.orderDetailDao().insert(detail);
+                    db.orderDetailDao().insert(new OrderDetail(newOrderId, old.getProductId(), old.getQuantity(), product.getPrice()));
                 }
             }
 
-            // Update total
             double total = db.orderDetailDao().getTotalByOrderId(newOrderId);
             Order updatedOrder = db.orderDao().getOrderById(newOrderId);
             updatedOrder.setTotalAmount(total);
@@ -178,6 +200,7 @@ public class InvoiceActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 Toast.makeText(this, "Đã thêm sản phẩm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("openCart", true);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();

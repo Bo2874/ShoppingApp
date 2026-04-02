@@ -238,17 +238,24 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void updateFavoriteIcon() {
-        if (btnFavorite != null) {
-            btnFavorite.setImageResource(isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline);
-        }
+        if (btnFavorite == null) return;
+        btnFavorite.setImageResource(isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline);
     }
 
     private void toggleFavorite() {
         if (!sessionManager.isLoggedIn()) {
-            Toast.makeText(this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
+            promptLogin();
             return;
         }
         if (product == null) return;
+
+        // Animate heart
+        if (btnFavorite != null) {
+            btnFavorite.animate().scaleX(0.6f).scaleY(0.6f).setDuration(100).withEndAction(() ->
+                    btnFavorite.animate().scaleX(1f).scaleY(1f).setDuration(200).start()
+            ).start();
+        }
+
         AppDatabase.databaseExecutor.execute(() -> {
             if (isFavorite) {
                 db.favoriteDao().delete(sessionManager.getUserId(), product.getId());
@@ -257,7 +264,10 @@ public class ProductDetailActivity extends AppCompatActivity {
                 db.favoriteDao().insert(new Favorite(sessionManager.getUserId(), product.getId()));
                 isFavorite = true;
             }
-            runOnUiThread(this::updateFavoriteIcon);
+            runOnUiThread(() -> {
+                updateFavoriteIcon();
+                Toast.makeText(this, isFavorite ? "Đã thêm vào yêu thích" : "Đã bỏ yêu thích", Toast.LENGTH_SHORT).show();
+            });
         });
     }
 
