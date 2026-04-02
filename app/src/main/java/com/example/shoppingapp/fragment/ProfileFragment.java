@@ -34,7 +34,7 @@ public class ProfileFragment extends Fragment {
     private AppDatabase db;
     private LinearLayout layoutNotLoggedIn;
     private ScrollView layoutLoggedIn;
-    private TextView tvProfileName, tvProfileUsername, tvNoOrders;
+    private TextView tvProfileName, tvProfileUsername, tvProfileEmail, tvProfilePhone, tvNoOrders;
     private TextView chipAll, chipDelivering, chipPaid;
     private OrderHistoryAdapter orderAdapter;
     private final List<Order> orders = new ArrayList<>();
@@ -61,6 +61,8 @@ public class ProfileFragment extends Fragment {
         layoutLoggedIn = view.findViewById(R.id.layoutLoggedIn);
         tvProfileName = view.findViewById(R.id.tvProfileName);
         tvProfileUsername = view.findViewById(R.id.tvProfileUsername);
+        tvProfileEmail = view.findViewById(R.id.tvProfileEmail);
+        tvProfilePhone = view.findViewById(R.id.tvProfilePhone);
         tvNoOrders = view.findViewById(R.id.tvNoOrders);
 
         // Filter chips
@@ -120,6 +122,18 @@ public class ProfileFragment extends Fragment {
             layoutLoggedIn.setVisibility(View.VISIBLE);
             tvProfileName.setText(sessionManager.getFullName());
             tvProfileUsername.setText("@" + sessionManager.getUsername());
+
+            String email = sessionManager.getEmail();
+            if (email != null && !email.isEmpty()) {
+                tvProfileEmail.setText(email);
+                tvProfileEmail.setVisibility(View.VISIBLE);
+            }
+            String phone = sessionManager.getPhone();
+            if (phone != null && !phone.isEmpty()) {
+                tvProfilePhone.setText(phone);
+                tvProfilePhone.setVisibility(View.VISIBLE);
+            }
+
             loadOrderHistory();
         } else {
             layoutNotLoggedIn.setVisibility(View.VISIBLE);

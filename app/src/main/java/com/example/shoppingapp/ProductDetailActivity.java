@@ -305,31 +305,22 @@ public class ProductDetailActivity extends AppCompatActivity {
         if (product == null) return;
         AppDatabase.databaseExecutor.execute(() -> {
             int userId = sessionManager.getUserId();
-            Order order = db.orderDao().getPendingOrder(userId);
-            int orderId;
-            if (order == null) {
-                String date = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date());
-                orderId = (int) db.orderDao().insert(new Order(userId, date, 0, "Pending"));
-            } else {
-                orderId = order.getId();
-            }
 
-            OrderDetail existing = db.orderDetailDao().getOrderDetail(orderId, product.getId());
-            if (existing != null) {
-                db.orderDetailDao().setQuantity(existing.getId(), Math.min(existing.getQuantity() + 1, 99));
-            } else {
-                db.orderDetailDao().insert(new OrderDetail(orderId, product.getId(), 1, product.getPrice()));
-            }
+            // Tạo đơn hàng MỚI riêng cho "Mua ngay", không dùng giỏ hàng pending
+            String date = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date());
+            Order buyNowOrder = new Order(userId, date, 0, "BuyNow");
+            int orderId = (int) db.orderDao().insert(buyNowOrder);
+
+            db.orderDetailDao().insert(new OrderDetail(orderId, product.getId(), 1, product.getPrice()));
 
             double total = db.orderDetailDao().getTotalByOrderId(orderId);
             Order updated = db.orderDao().getOrderById(orderId);
             updated.setTotalAmount(total);
             db.orderDao().update(updated);
 
-            int finalOrderId = orderId;
             runOnUiThread(() -> {
                 Intent intent = new Intent(this, CheckoutActivity.class);
-                intent.putExtra("orderId", finalOrderId);
+                intent.putExtra("orderId", orderId);
                 startActivity(intent);
             });
         });

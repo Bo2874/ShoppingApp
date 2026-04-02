@@ -58,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
             User user = db.userDao().login(username, password);
             runOnUiThread(() -> {
                 if (user != null) {
-                    sessionManager.createLoginSession(user.getId(), user.getUsername(), user.getFullName());
+                    sessionManager.createLoginSession(user.getId(), user.getUsername(), user.getFullName(), user.getEmail(), user.getPhone());
                     setResult(RESULT_OK);
                     finish();
                 } else {

@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.shoppingapp.CategoryListActivity;
 import com.example.shoppingapp.MainActivity;
 import com.example.shoppingapp.ProductDetailActivity;
 import com.example.shoppingapp.ProductListActivity;
@@ -79,7 +80,7 @@ public class HomeFragment extends Fragment {
 
         // See all buttons
         view.findViewById(R.id.tvSeeAllCategories).setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), ProductListActivity.class);
+            Intent intent = new Intent(requireContext(), CategoryListActivity.class);
             startActivity(intent);
         });
 

@@ -29,7 +29,7 @@ public interface OrderDao {
     @Query("SELECT * FROM orders WHERE userId = :userId AND status = 'Paid' ORDER BY orderDate DESC")
     List<Order> getPaidOrders(int userId);
 
-    @Query("SELECT * FROM orders WHERE userId = :userId AND status != 'Pending' ORDER BY orderDate DESC")
+    @Query("SELECT * FROM orders WHERE userId = :userId AND status NOT IN ('Pending', 'BuyNow') ORDER BY orderDate DESC")
     List<Order> getCompletedOrders(int userId);
 
     @Query("SELECT * FROM orders WHERE userId = :userId AND status = :status ORDER BY orderDate DESC")
