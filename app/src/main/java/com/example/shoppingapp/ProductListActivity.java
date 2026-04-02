@@ -11,7 +11,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.shoppingapp.adapter.ProductAdapter;
 import com.example.shoppingapp.database.AppDatabase;
@@ -28,6 +30,10 @@ public class ProductListActivity extends AppCompatActivity {
     private AppDatabase db;
     private int categoryId = -1;
     private TextView tvEmptyResult;
+    private RecyclerView rv;
+    private SwipeRefreshLayout swipeRefresh;
+    private ImageButton btnToggleView;
+    private boolean isGridView = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +57,11 @@ public class ProductListActivity extends AppCompatActivity {
         ImageButton btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
-        RecyclerView rv = findViewById(R.id.rvProducts);
+        // Grid/List toggle
+        btnToggleView = findViewById(R.id.btnToggleView);
+        btnToggleView.setOnClickListener(v -> toggleViewType());
+
+        rv = findViewById(R.id.rvProducts);
         rv.setLayoutManager(new GridLayoutManager(this, 2));
         adapter = new ProductAdapter(products, product -> {
             Intent intent = new Intent(this, ProductDetailActivity.class);
@@ -59,6 +69,11 @@ public class ProductListActivity extends AppCompatActivity {
             startActivity(intent);
         });
         rv.setAdapter(adapter);
+
+        // Pull to refresh
+        swipeRefresh = findViewById(R.id.swipeRefresh);
+        swipeRefresh.setColorSchemeResources(R.color.green_primary);
+        swipeRefresh.setOnRefreshListener(this::loadProducts);
 
         // Search
         EditText etSearch = findViewById(R.id.etSearchProduct);
@@ -76,6 +91,19 @@ public class ProductListActivity extends AppCompatActivity {
         loadProducts();
     }
 
+    private void toggleViewType() {
+        isGridView = !isGridView;
+        if (isGridView) {
+            rv.setLayoutManager(new GridLayoutManager(this, 2));
+            btnToggleView.setImageResource(R.drawable.ic_list);
+            adapter.setViewType(ProductAdapter.VIEW_TYPE_GRID);
+        } else {
+            rv.setLayoutManager(new LinearLayoutManager(this));
+            btnToggleView.setImageResource(R.drawable.ic_grid);
+            adapter.setViewType(ProductAdapter.VIEW_TYPE_LIST);
+        }
+    }
+
     private void loadProducts() {
         AppDatabase.databaseExecutor.execute(() -> {
             List<Product> result;
@@ -90,17 +118,22 @@ public class ProductListActivity extends AppCompatActivity {
                 products.addAll(result);
                 adapter.notifyDataSetChanged();
                 updateEmptyState();
+                swipeRefresh.setRefreshing(false);
             });
         });
     }
 
     private void filterProducts(String query) {
-        products.clear();
         if (query.isEmpty()) {
+            products.clear();
             products.addAll(allProducts);
         } else {
+            // Search by name and description
+            String lowerQuery = query.toLowerCase();
+            products.clear();
             for (Product p : allProducts) {
-                if (p.getName().toLowerCase().contains(query.toLowerCase())) {
+                if (p.getName().toLowerCase().contains(lowerQuery)
+                        || p.getDescription().toLowerCase().contains(lowerQuery)) {
                     products.add(p);
                 }
             }

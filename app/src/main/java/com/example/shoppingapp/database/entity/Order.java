@@ -20,6 +20,8 @@ public class Order {
     private String orderDate;
     private double totalAmount;
     private String status; // "Pending", "Paid"
+    private String address;
+    private String paymentMethod; // "COD", "BankTransfer", "EWallet"
 
     public Order(int userId, String orderDate, double totalAmount, String status) {
         this.userId = userId;
@@ -38,4 +40,8 @@ public class Order {
     public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 }

@@ -1,9 +1,12 @@
 package com.example.shoppingapp;
 
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -11,8 +14,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.shoppingapp.adapter.ProductAdapter;
 import com.example.shoppingapp.database.AppDatabase;
 import com.example.shoppingapp.database.entity.Category;
 import com.example.shoppingapp.database.entity.Order;
@@ -21,7 +27,9 @@ import com.example.shoppingapp.database.entity.Product;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class ProductDetailActivity extends AppCompatActivity {
@@ -49,7 +57,6 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         int productId = getIntent().getIntExtra("productId", -1);
 
-        // Validate productId
         if (productId == -1) {
             Toast.makeText(this, "Không tìm thấy sản phẩm", Toast.LENGTH_SHORT).show();
             finish();
@@ -61,11 +68,15 @@ public class ProductDetailActivity extends AppCompatActivity {
         TextView tvDescription = findViewById(R.id.tvDetailDescription);
         TextView tvCategory = findViewById(R.id.tvDetailCategory);
         TextView tvPrice = findViewById(R.id.tvDetailPrice);
+        TextView tvOriginalPrice = findViewById(R.id.tvOriginalPrice);
+        TextView tvSaleBadge = findViewById(R.id.tvSaleBadge);
         tvQuantity = findViewById(R.id.tvQuantity);
         TextView btnMinus = findViewById(R.id.btnMinus);
         TextView btnPlus = findViewById(R.id.btnPlus);
         TextView btnAddToCart = findViewById(R.id.btnAddToCart);
         ImageButton btnBack = findViewById(R.id.btnBack);
+        LinearLayout layoutRelated = findViewById(R.id.layoutRelatedProducts);
+        RecyclerView rvRelated = findViewById(R.id.rvRelatedProducts);
 
         btnBack.setOnClickListener(v -> finish());
 
@@ -120,6 +131,11 @@ public class ProductDetailActivity extends AppCompatActivity {
                 return;
             }
             Category category = db.categoryDao().getCategoryById(product.getCategoryId());
+
+            // Load related products
+            List<Product> relatedProducts = db.productDao().getRelatedProducts(
+                    product.getCategoryId(), product.getId(), 4);
+
             runOnUiThread(() -> {
                 tvName.setText(product.getName());
                 tvDescription.setText(product.getDescription());
@@ -127,11 +143,37 @@ public class ProductDetailActivity extends AppCompatActivity {
                 NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
                 tvPrice.setText(formatter.format(product.getPrice()) + "đ/" + product.getUnit());
 
+                // Show sale price
+                if (product.isOnSale()) {
+                    tvOriginalPrice.setVisibility(View.VISIBLE);
+                    tvOriginalPrice.setText(formatter.format(product.getOriginalPrice()) + "đ");
+                    tvOriginalPrice.setPaintFlags(tvOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+
+                    int percent = (int) ((1 - product.getPrice() / product.getOriginalPrice()) * 100);
+                    tvSaleBadge.setText("GIẢM " + percent + "%");
+                    tvSaleBadge.setVisibility(View.VISIBLE);
+                }
+
                 Glide.with(this)
                         .load(product.getImageUrl())
                         .placeholder(R.drawable.ic_placeholder)
                         .error(R.drawable.ic_placeholder)
                         .into(ivProduct);
+
+                // Related products
+                if (!relatedProducts.isEmpty()) {
+                    layoutRelated.setVisibility(View.VISIBLE);
+                    List<Product> relatedList = new ArrayList<>(relatedProducts);
+                    rvRelated.setLayoutManager(new GridLayoutManager(this, 2));
+                    rvRelated.setNestedScrollingEnabled(false);
+                    ProductAdapter relatedAdapter = new ProductAdapter(relatedList, p -> {
+                        Intent intent = new Intent(this, ProductDetailActivity.class);
+                        intent.putExtra("productId", p.getId());
+                        startActivity(intent);
+                        finish();
+                    });
+                    rvRelated.setAdapter(relatedAdapter);
+                }
             });
         });
     }
@@ -153,10 +195,12 @@ public class ProductDetailActivity extends AppCompatActivity {
                 orderId = order.getId();
             }
 
-            // Check if product already in order
+            // Check if product already in order - ADD quantity instead of replacing
             OrderDetail existing = db.orderDetailDao().getOrderDetail(orderId, product.getId());
+            boolean isUpdate = existing != null;
             if (existing != null) {
-                db.orderDetailDao().updateQuantity(existing.getId(), quantity);
+                int newQty = Math.min(existing.getQuantity() + quantity, 99);
+                db.orderDetailDao().setQuantity(existing.getId(), newQty);
             } else {
                 OrderDetail detail = new OrderDetail(orderId, product.getId(), quantity, product.getPrice());
                 db.orderDetailDao().insert(detail);
@@ -169,14 +213,15 @@ public class ProductDetailActivity extends AppCompatActivity {
             db.orderDao().update(updatedOrder);
 
             runOnUiThread(() -> {
-                Toast.makeText(this, "Đã thêm " + product.getName() + " vào giỏ hàng!", Toast.LENGTH_SHORT).show();
+                String message = isUpdate
+                        ? getString(R.string.added_to_cart_update)
+                        : "Đã thêm " + product.getName() + " vào giỏ hàng!";
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 
                 new AlertDialog.Builder(this)
                         .setTitle("Thêm thành công!")
                         .setMessage("Bạn muốn tiếp tục mua sắm hay xem giỏ hàng?")
-                        .setPositiveButton("Xem giỏ hàng", (dialog, which) -> {
-                            finish();
-                        })
+                        .setPositiveButton("Xem giỏ hàng", (dialog, which) -> finish())
                         .setNegativeButton("Tiếp tục mua", (dialog, which) -> finish())
                         .show();
             });

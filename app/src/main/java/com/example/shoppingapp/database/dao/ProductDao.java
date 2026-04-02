@@ -28,6 +28,12 @@ public interface ProductDao {
     @Query("SELECT * FROM products WHERE name LIKE '%' || :query || '%'")
     List<Product> searchProducts(String query);
 
+    @Query("SELECT * FROM products WHERE name LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%'")
+    List<Product> searchProductsAdvanced(String query);
+
     @Query("SELECT * FROM products LIMIT :limit")
     List<Product> getFeaturedProducts(int limit);
+
+    @Query("SELECT * FROM products WHERE categoryId = :categoryId AND id != :excludeId LIMIT :limit")
+    List<Product> getRelatedProducts(int categoryId, int excludeId, int limit);
 }

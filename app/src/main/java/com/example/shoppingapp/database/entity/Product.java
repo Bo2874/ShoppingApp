@@ -22,6 +22,7 @@ public class Product {
     private String imageUrl;
     private String unit;
     private int categoryId;
+    private double originalPrice; // 0 means no discount
 
     public Product(String name, String description, double price, String imageUrl, String unit, int categoryId) {
         this.name = name;
@@ -30,6 +31,7 @@ public class Product {
         this.imageUrl = imageUrl;
         this.unit = unit;
         this.categoryId = categoryId;
+        this.originalPrice = 0;
     }
 
     public int getId() { return id; }
@@ -46,4 +48,7 @@ public class Product {
     public void setUnit(String unit) { this.unit = unit; }
     public int getCategoryId() { return categoryId; }
     public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
+    public double getOriginalPrice() { return originalPrice; }
+    public void setOriginalPrice(double originalPrice) { this.originalPrice = originalPrice; }
+    public boolean isOnSale() { return originalPrice > 0 && originalPrice > price; }
 }

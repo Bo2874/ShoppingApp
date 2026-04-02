@@ -26,4 +26,22 @@
     <string name="login_required">Vui lòng đăng nhập để mua hàng</string>
     <string name="welcome">Chào mừng bạn!</string>
     <string name="order_history">Lịch sử đơn hàng</string>
+    <string name="related_products">Sản phẩm liên quan</string>
+    <string name="swipe_to_delete">Vuốt sang trái để xóa</string>
+    <string name="grid_view">Dạng lưới</string>
+    <string name="list_view">Dạng danh sách</string>
+    <string name="search_history">Lịch sử tìm kiếm</string>
+    <string name="clear_history">Xóa lịch sử</string>
+    <string name="delivery_address">Địa chỉ giao hàng</string>
+    <string name="payment_method">Phương thức thanh toán</string>
+    <string name="confirm_order">Xác nhận đặt hàng</string>
+    <string name="cod_payment">Thanh toán khi nhận hàng (COD)</string>
+    <string name="bank_transfer">Chuyển khoản ngân hàng</string>
+    <string name="ewallet_payment">Ví điện tử</string>
+    <string name="reorder">Mua lại</string>
+    <string name="all_orders">Tất cả</string>
+    <string name="filter_paid">Đã thanh toán</string>
+    <string name="address_hint">Nhập địa chỉ giao hàng…</string>
+    <string name="sale_badge">GIẢM GIÁ</string>
+    <string name="added_to_cart_update">Đã cập nhật số lượng trong giỏ hàng!</string>
 </resources>

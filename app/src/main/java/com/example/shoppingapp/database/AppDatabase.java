@@ -22,7 +22,7 @@ import com.example.shoppingapp.database.entity.User;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {User.class, Category.class, Product.class, Order.class, OrderDetail.class}, version = 3, exportSchema = false)
+@Database(entities = {User.class, Category.class, Product.class, Order.class, OrderDetail.class}, version = 4, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract UserDao userDao();
@@ -42,7 +42,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                     context.getApplicationContext(),
                                     AppDatabase.class,
                                     "shopping_db")
-                            .fallbackToDestructiveMigration()
+                            .fallbackToDestructiveMigration(true)
                             .addCallback(seedCallback)
                             .build();
                 }
@@ -89,9 +89,12 @@ public abstract class AppDatabase extends RoomDatabase {
                 ProductDao productDao = database.productDao();
 
                 // Rau lá (categoryId = 1)
-                productDao.insert(new Product("Rau cải xanh",
+                Product p;
+                p = new Product("Rau cải xanh",
                         "Rau cải xanh tươi, giàu vitamin C và chất xơ",
-                        15000, "https://i.imgur.com/YbH3mkk.jpg", "bó", 1));
+                        12000, "https://i.imgur.com/YbH3mkk.jpg", "bó", 1);
+                p.setOriginalPrice(15000);
+                productDao.insert(p);
                 productDao.insert(new Product("Xà lách",
                         "Xà lách giòn tươi, thích hợp làm salad",
                         12000, "https://i.imgur.com/T7C8jKQ.jpg", "bó", 1));
@@ -109,9 +112,11 @@ public abstract class AppDatabase extends RoomDatabase {
                 productDao.insert(new Product("Khoai tây",
                         "Khoai tây sạch, thích hợp chiên, nướng, hầm",
                         18000, "https://i.imgur.com/Q1LGOWB.jpg", "kg", 2));
-                productDao.insert(new Product("Cà chua",
+                p = new Product("Cà chua",
                         "Cà chua chín đỏ, giàu lycopene",
-                        30000, "https://i.imgur.com/DPGZOQL.jpg", "kg", 2));
+                        25000, "https://i.imgur.com/DPGZOQL.jpg", "kg", 2);
+                p.setOriginalPrice(30000);
+                productDao.insert(p);
                 productDao.insert(new Product("Hành tây",
                         "Hành tây tươi, thơm nồng đặc trưng",
                         22000, "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=400", "kg", 2));
@@ -129,9 +134,11 @@ public abstract class AppDatabase extends RoomDatabase {
                 productDao.insert(new Product("Táo",
                         "Táo đỏ giòn ngọt, nhập khẩu chất lượng",
                         55000, "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400", "kg", 3));
-                productDao.insert(new Product("Dâu tây",
+                p = new Product("Dâu tây",
                         "Dâu tây Đà Lạt tươi, thơm ngon tự nhiên",
-                        85000, "https://i.imgur.com/e6jq8RE.jpg", "hộp", 3));
+                        69000, "https://i.imgur.com/e6jq8RE.jpg", "hộp", 3);
+                p.setOriginalPrice(85000);
+                productDao.insert(p);
                 productDao.insert(new Product("Nho",
                         "Nho xanh không hạt, ngọt thanh mát",
                         65000, "https://i.imgur.com/f7rMMFk.jpg", "kg", 3));

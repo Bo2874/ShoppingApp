@@ -42,6 +42,7 @@ dependencies {
     annotationProcessor(libs.room.compiler)
     implementation(libs.recyclerview)
     implementation(libs.cardview)
+    implementation(libs.swiperefreshlayout)
     implementation(libs.glide)
     implementation(libs.glide.okhttp3)
     annotationProcessor(libs.glide.compiler)

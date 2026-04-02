@@ -7,7 +7,9 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,9 +19,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.shoppingapp.MainActivity;
 import com.example.shoppingapp.ProductDetailActivity;
 import com.example.shoppingapp.ProductListActivity;
 import com.example.shoppingapp.R;
+import com.example.shoppingapp.SearchHistoryManager;
 import com.example.shoppingapp.adapter.HomeCategoryAdapter;
 import com.example.shoppingapp.adapter.ProductAdapter;
 import com.example.shoppingapp.database.AppDatabase;
@@ -36,6 +40,9 @@ public class HomeFragment extends Fragment {
     private HomeCategoryAdapter categoryAdapter;
     private final List<Product> products = new ArrayList<>();
     private final List<Category> categories = new ArrayList<>();
+    private SearchHistoryManager searchHistoryManager;
+    private LinearLayout layoutSearchHistory;
+    private LinearLayout layoutSearchHistoryTags;
 
     @Nullable
     @Override
@@ -47,6 +54,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         db = AppDatabase.getInstance(requireContext());
+        searchHistoryManager = new SearchHistoryManager(requireContext());
 
         // Categories horizontal list
         RecyclerView rvCategories = view.findViewById(R.id.rvHomeCategories);
@@ -71,14 +79,23 @@ public class HomeFragment extends Fragment {
 
         // See all buttons
         view.findViewById(R.id.tvSeeAllCategories).setOnClickListener(v -> {
-            if (getActivity() instanceof com.example.shoppingapp.MainActivity) {
-                ((com.example.shoppingapp.MainActivity) getActivity()).switchToTab(R.id.nav_category);
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).switchToTab(R.id.nav_category);
             }
         });
 
         view.findViewById(R.id.tvSeeAllProducts).setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), ProductListActivity.class);
             startActivity(intent);
+        });
+
+        // Search history
+        layoutSearchHistory = view.findViewById(R.id.layoutSearchHistory);
+        layoutSearchHistoryTags = view.findViewById(R.id.layoutSearchHistoryTags);
+        TextView tvClearHistory = view.findViewById(R.id.tvClearHistory);
+        tvClearHistory.setOnClickListener(v -> {
+            searchHistoryManager.clearHistory();
+            layoutSearchHistory.setVisibility(View.GONE);
         });
 
         // Search
@@ -90,11 +107,74 @@ public class HomeFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
-                searchProducts(s.toString().trim());
+                String query = s.toString().trim();
+                if (query.isEmpty()) {
+                    loadData();
+                    showSearchHistory();
+                } else {
+                    layoutSearchHistory.setVisibility(View.GONE);
+                    searchProducts(query);
+                }
+            }
+        });
+
+        etSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                String query = etSearch.getText().toString().trim();
+                if (!query.isEmpty()) {
+                    searchHistoryManager.addQuery(query);
+                }
+                return true;
+            }
+            return false;
+        });
+
+        etSearch.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus && etSearch.getText().toString().trim().isEmpty()) {
+                showSearchHistory();
             }
         });
 
         loadData();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).updateCartBadge();
+        }
+    }
+
+    private void showSearchHistory() {
+        List<String> history = searchHistoryManager.getHistory();
+        if (history.isEmpty()) {
+            layoutSearchHistory.setVisibility(View.GONE);
+            return;
+        }
+
+        layoutSearchHistoryTags.removeAllViews();
+        EditText etSearch = requireView().findViewById(R.id.etSearch);
+
+        for (String query : history) {
+            TextView tag = new TextView(requireContext());
+            tag.setText(query);
+            tag.setTextSize(13);
+            tag.setBackgroundResource(R.drawable.bg_search_history_item);
+            tag.setPadding(24, 12, 24, 12);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 0, 12, 8);
+            tag.setLayoutParams(params);
+            tag.setOnClickListener(v -> {
+                etSearch.setText(query);
+                etSearch.setSelection(query.length());
+            });
+            layoutSearchHistoryTags.addView(tag);
+        }
+
+        layoutSearchHistory.setVisibility(View.VISIBLE);
     }
 
     private void loadData() {
@@ -117,12 +197,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void searchProducts(String query) {
-        if (query.isEmpty()) {
-            loadData();
-            return;
-        }
         AppDatabase.databaseExecutor.execute(() -> {
-            List<Product> result = db.productDao().searchProducts(query);
+            List<Product> result = db.productDao().searchProductsAdvanced(query);
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> productAdapter.updateList(result));
             }

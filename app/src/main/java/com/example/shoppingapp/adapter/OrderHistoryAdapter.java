@@ -45,7 +45,13 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
         holder.tvOrderId.setText("Đơn hàng #" + order.getId());
         holder.tvOrderDate.setText(order.getOrderDate());
         holder.tvOrderTotal.setText(formatter.format(order.getTotalAmount()) + "đ");
-        holder.tvOrderStatus.setText("Đã thanh toán");
+        String statusText;
+        switch (order.getStatus()) {
+            case "Paid": statusText = "Đã thanh toán"; break;
+            case "Pending": statusText = "Chờ thanh toán"; break;
+            default: statusText = order.getStatus();
+        }
+        holder.tvOrderStatus.setText(statusText);
 
         holder.itemView.setOnClickListener(v -> listener.onOrderClick(order));
     }

@@ -1,6 +1,10 @@
 package com.example.shoppingapp.fragment;
 
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,12 +15,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.shoppingapp.InvoiceActivity;
+import com.example.shoppingapp.CheckoutActivity;
 import com.example.shoppingapp.R;
 import com.example.shoppingapp.SessionManager;
 import com.example.shoppingapp.adapter.CartAdapter;
@@ -63,6 +67,50 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new CartAdapter(cartItems, productMap, this);
         rv.setAdapter(adapter);
+
+        // Swipe to delete
+        ItemTouchHelper.SimpleCallback swipeCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                if (position >= 0 && position < cartItems.size()) {
+                    OrderDetail item = cartItems.get(position);
+                    deleteItem(item, position);
+                }
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
+                                    @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
+                                    int actionState, boolean isCurrentlyActive) {
+                if (dX < 0) {
+                    View itemView = viewHolder.itemView;
+                    Paint paint = new Paint();
+                    paint.setColor(Color.parseColor("#D32F2F"));
+                    float cornerRadius = 12 * recyclerView.getContext().getResources().getDisplayMetrics().density;
+                    RectF background = new RectF(itemView.getRight() + dX, itemView.getTop(),
+                            itemView.getRight(), itemView.getBottom());
+                    c.drawRoundRect(background, cornerRadius, cornerRadius, paint);
+
+                    // Draw "Xóa" text
+                    Paint textPaint = new Paint();
+                    textPaint.setColor(Color.WHITE);
+                    textPaint.setTextSize(14 * recyclerView.getContext().getResources().getDisplayMetrics().scaledDensity);
+                    textPaint.setAntiAlias(true);
+                    textPaint.setTextAlign(Paint.Align.CENTER);
+                    float textX = itemView.getRight() - 50 * recyclerView.getContext().getResources().getDisplayMetrics().density;
+                    float textY = itemView.getTop() + (itemView.getHeight() + textPaint.getTextSize()) / 2f;
+                    c.drawText("Xóa", textX, textY, textPaint);
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        };
+        new ItemTouchHelper(swipeCallback).attachToRecyclerView(rv);
 
         view.findViewById(R.id.btnCheckout).setOnClickListener(v -> checkout());
 
@@ -155,29 +203,29 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
 
     @Override
     public void onItemDeleted(OrderDetail item) {
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Xác nhận xóa")
-                .setMessage("Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?")
-                .setPositiveButton("Xóa", (dialog, which) -> {
-                    AppDatabase.databaseExecutor.execute(() -> {
-                        db.orderDetailDao().deleteById(item.getId());
-                        int remainingCount = db.orderDetailDao().getItemCount(orderId);
-                        if (remainingCount == 0) {
-                            db.orderDao().deleteById(orderId);
-                            orderId = -1;
-                        } else {
-                            double total = db.orderDetailDao().getTotalByOrderId(orderId);
-                            Order order = db.orderDao().getOrderById(orderId);
-                            order.setTotalAmount(total);
-                            db.orderDao().update(order);
-                        }
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(this::loadCart);
-                        }
-                    });
-                })
-                .setNegativeButton("Hủy", null)
-                .show();
+        int position = cartItems.indexOf(item);
+        if (position >= 0) {
+            deleteItem(item, position);
+        }
+    }
+
+    private void deleteItem(OrderDetail item, int position) {
+        AppDatabase.databaseExecutor.execute(() -> {
+            db.orderDetailDao().deleteById(item.getId());
+            int remainingCount = db.orderDetailDao().getItemCount(orderId);
+            if (remainingCount == 0) {
+                db.orderDao().deleteById(orderId);
+                orderId = -1;
+            } else {
+                double total = db.orderDetailDao().getTotalByOrderId(orderId);
+                Order order = db.orderDao().getOrderById(orderId);
+                order.setTotalAmount(total);
+                db.orderDao().update(order);
+            }
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(this::loadCart);
+            }
+        });
     }
 
     private void checkout() {
@@ -191,39 +239,9 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
             return;
         }
 
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        double currentTotal = 0;
-        for (OrderDetail item : cartItems) {
-            currentTotal += item.getQuantity() * item.getUnitPrice();
-        }
-
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Xác nhận thanh toán")
-                .setMessage("Tổng tiền: " + formatter.format(currentTotal) + "đ\n\nBạn có chắc muốn thanh toán đơn hàng này?")
-                .setPositiveButton("Thanh toán", (dialog, which) -> processCheckout())
-                .setNegativeButton("Hủy", null)
-                .show();
-    }
-
-    private void processCheckout() {
-        AppDatabase.databaseExecutor.execute(() -> {
-            Order order = db.orderDao().getOrderById(orderId);
-            if (order == null) return;
-            order.setStatus("Paid");
-            db.orderDao().update(order);
-
-            int completedOrderId = orderId;
-            orderId = -1;
-
-            if (getActivity() != null) {
-                getActivity().runOnUiThread(() -> {
-                    Toast.makeText(requireContext(), "Thanh toán thành công!", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(requireContext(), InvoiceActivity.class);
-                    intent.putExtra("orderId", completedOrderId);
-                    startActivity(intent);
-                    loadCart();
-                });
-            }
-        });
+        // Navigate to CheckoutActivity
+        Intent intent = new Intent(requireContext(), CheckoutActivity.class);
+        intent.putExtra("orderId", orderId);
+        startActivity(intent);
     }
 }
