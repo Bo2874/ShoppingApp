@@ -82,8 +82,12 @@ public class ProductDetailActivity extends AppCompatActivity {
         ImageButton btnBack = findViewById(R.id.btnBack);
         ImageButton btnAddToCartIcon = findViewById(R.id.btnAddToCartIcon);
         View btnBuyNow = findViewById(R.id.btnBuyNow);
+        btnFavorite = findViewById(R.id.btnFavorite);
 
         btnBack.setOnClickListener(v -> finish());
+        if (btnFavorite != null) {
+            btnFavorite.setOnClickListener(v -> toggleFavorite());
+        }
 
         // Tab toggle
         if (tvTabDescription != null && tvTabReviews != null) {

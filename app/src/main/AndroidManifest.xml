@@ -31,6 +31,7 @@
         <activity android:name=".ProductDetailActivity" />
         <activity android:name=".InvoiceActivity" />
         <activity android:name=".CheckoutActivity" />
+        <activity android:name=".OrderSuccessActivity" />
 
     </application>
 

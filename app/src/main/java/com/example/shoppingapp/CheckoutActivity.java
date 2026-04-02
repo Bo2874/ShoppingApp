@@ -136,8 +136,7 @@ public class CheckoutActivity extends AppCompatActivity {
             db.orderDao().update(order);
 
             runOnUiThread(() -> {
-                Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(this, InvoiceActivity.class);
+                Intent intent = new Intent(this, OrderSuccessActivity.class);
                 intent.putExtra("orderId", orderId);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);

@@ -127,19 +127,34 @@ public class ProductListActivity extends AppCompatActivity {
         if (query.isEmpty()) {
             products.clear();
             products.addAll(allProducts);
+            adapter.notifyDataSetChanged();
+            updateEmptyState();
         } else {
-            // Search by name and description
-            String lowerQuery = query.toLowerCase();
-            products.clear();
-            for (Product p : allProducts) {
-                if (p.getName().toLowerCase().contains(lowerQuery)
-                        || p.getDescription().toLowerCase().contains(lowerQuery)) {
-                    products.add(p);
+            // Search from DB to get results across all products
+            AppDatabase.databaseExecutor.execute(() -> {
+                List<Product> result;
+                if (categoryId > 0) {
+                    // Filter within category locally
+                    String lowerQuery = query.toLowerCase();
+                    result = new ArrayList<>();
+                    for (Product p : allProducts) {
+                        if (p.getName().toLowerCase().contains(lowerQuery)
+                                || (p.getBrand() != null && p.getBrand().toLowerCase().contains(lowerQuery))
+                                || p.getDescription().toLowerCase().contains(lowerQuery)) {
+                            result.add(p);
+                        }
+                    }
+                } else {
+                    result = db.productDao().searchProducts(query);
                 }
-            }
+                runOnUiThread(() -> {
+                    products.clear();
+                    products.addAll(result);
+                    adapter.notifyDataSetChanged();
+                    updateEmptyState();
+                });
+            });
         }
-        adapter.notifyDataSetChanged();
-        updateEmptyState();
     }
 
     private void updateEmptyState() {

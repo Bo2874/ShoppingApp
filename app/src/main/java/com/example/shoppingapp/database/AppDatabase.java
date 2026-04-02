@@ -93,6 +93,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 categoryDao.insert(new Category("Boots", "Giày boot cá tính", "https://cdn-icons-png.flaticon.com/128/2310/2310760.png"));
 
                 // === Seed Products ===
+                // Thay URL ảnh bên dưới bằng link ảnh thật của từng sản phẩm
                 ProductDao productDao = database.productDao();
                 Product p;
 
