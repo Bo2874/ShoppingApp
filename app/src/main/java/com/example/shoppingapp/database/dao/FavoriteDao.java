@@ -23,6 +23,9 @@ public interface FavoriteDao {
     @Query("SELECT p.* FROM products p INNER JOIN favorites f ON p.id = f.productId WHERE f.userId = :userId")
     List<Product> getFavoriteProducts(int userId);
 
+    @Query("SELECT productId FROM favorites WHERE userId = :userId")
+    List<Integer> getFavoriteProductIds(int userId);
+
     @Query("SELECT COUNT(*) FROM favorites WHERE userId = :userId")
     int getFavoriteCount(int userId);
 }

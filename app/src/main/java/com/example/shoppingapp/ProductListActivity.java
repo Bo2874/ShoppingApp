@@ -28,6 +28,7 @@ public class ProductListActivity extends AppCompatActivity {
     private final List<Product> products = new ArrayList<>();
     private List<Product> allProducts = new ArrayList<>();
     private AppDatabase db;
+    private SessionManager sessionManager;
     private int categoryId = -1;
     private TextView tvEmptyResult;
     private RecyclerView rv;
@@ -41,6 +42,7 @@ public class ProductListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_product_list);
 
         db = AppDatabase.getInstance(this);
+        sessionManager = new SessionManager(this);
 
         categoryId = getIntent().getIntExtra("categoryId", -1);
         String categoryName = getIntent().getStringExtra("categoryName");
@@ -89,6 +91,23 @@ public class ProductListActivity extends AppCompatActivity {
         });
 
         loadProducts();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadFavorites();
+    }
+
+    private void loadFavorites() {
+        if (!sessionManager.isLoggedIn()) {
+            adapter.setFavoriteProductIds(new ArrayList<>());
+            return;
+        }
+        AppDatabase.databaseExecutor.execute(() -> {
+            List<Integer> favoriteIds = db.favoriteDao().getFavoriteProductIds(sessionManager.getUserId());
+            runOnUiThread(() -> adapter.setFavoriteProductIds(favoriteIds));
+        });
     }
 
     private void toggleViewType() {

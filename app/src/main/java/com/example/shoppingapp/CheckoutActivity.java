@@ -73,7 +73,9 @@ public class CheckoutActivity extends AppCompatActivity {
             NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
 
             runOnUiThread(() -> {
-                tvTotal.setText(formatter.format(order.getTotalAmount()) + "đ");
+                if (order != null) {
+                    tvTotal.setText(formatter.format(order.getTotalAmount()) + "đ");
+                }
                 OrderDetailAdapter adapter = new OrderDetailAdapter(new ArrayList<>(details), productMap);
                 rvItems.setAdapter(adapter);
             });
@@ -100,37 +102,17 @@ public class CheckoutActivity extends AppCompatActivity {
             paymentMethod = "COD";
         }
 
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-
-        AppDatabase.databaseExecutor.execute(() -> {
-            Order order = db.orderDao().getOrderById(orderId);
-            if (order == null) return;
-            double total = order.getTotalAmount();
-
-            runOnUiThread(() -> {
-                String paymentLabel;
-                if (paymentMethod.equals("COD")) paymentLabel = "COD";
-                else if (paymentMethod.equals("BankTransfer")) paymentLabel = "Chuyển khoản";
-                else paymentLabel = "Ví điện tử";
-
-                new AlertDialog.Builder(this)
-                        .setTitle("Xác nhận đặt hàng")
-                        .setMessage("Địa chỉ: " + address +
-                                "\nPhương thức: " + paymentLabel +
-                                "\nTổng tiền: " + formatter.format(total) + "đ" +
-                                "\n\nBạn có chắc muốn đặt hàng?")
-                        .setPositiveButton("Xác nhận", (dialog, which) -> processOrder(address, paymentMethod))
-                        .setNegativeButton("Hủy", null)
-                        .show();
-            });
-        });
+        // Quy trình thanh toán luôn, không qua xác nhận đặt hàng nữa theo yêu cầu
+        processOrder(address, paymentMethod);
     }
 
     private void processOrder(String address, String paymentMethod) {
         AppDatabase.databaseExecutor.execute(() -> {
             Order order = db.orderDao().getOrderById(orderId);
             if (order == null) return;
-            order.setStatus(paymentMethod.equals("COD") ? "Delivering" : "Paid");
+            
+            // Trạng thái luôn là "Paid" sau khi thanh toán
+            order.setStatus("Paid");
             order.setAddress(address);
             order.setPaymentMethod(paymentMethod);
             db.orderDao().update(order);

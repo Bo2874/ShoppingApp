@@ -22,6 +22,7 @@ import com.example.shoppingapp.database.entity.Product;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FavoriteFragment extends Fragment {
 
@@ -71,10 +72,14 @@ public class FavoriteFragment extends Fragment {
         int userId = sessionManager.getUserId();
         AppDatabase.databaseExecutor.execute(() -> {
             List<Product> result = db.favoriteDao().getFavoriteProducts(userId);
+            // Lấy danh sách ID để cập nhật icon trái tim đỏ
+            List<Integer> favoriteIds = result.stream().map(Product::getId).collect(Collectors.toList());
+            
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> {
                     favorites.clear();
                     favorites.addAll(result);
+                    adapter.setFavoriteProductIds(favoriteIds);
                     adapter.notifyDataSetChanged();
 
                     if (favorites.isEmpty()) {

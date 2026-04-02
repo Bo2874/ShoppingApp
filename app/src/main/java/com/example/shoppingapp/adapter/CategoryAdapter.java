@@ -49,7 +49,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
                 .transform(new CenterCrop(), new RoundedCorners(16))
                 .placeholder(R.drawable.ic_placeholder)
                 .error(R.drawable.ic_placeholder)
-                .into(holder.ivCategory);
+                .into(holder.ivCategoryImage);
 
         holder.itemView.setOnClickListener(v -> listener.onCategoryClick(category));
     }
@@ -59,13 +59,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         return categories.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView ivCategory;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView ivCategoryImage;
         TextView tvName;
 
-        ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivCategory = itemView.findViewById(R.id.ivCategory);
+            ivCategoryImage = itemView.findViewById(R.id.ivCategoryImage);
             tvName = itemView.findViewById(R.id.tvCategoryName);
         }
     }

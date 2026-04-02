@@ -17,8 +17,11 @@ import com.example.shoppingapp.R;
 import com.example.shoppingapp.database.entity.Product;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder> {
 
@@ -28,6 +31,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     private final List<Product> products;
     private final OnProductClickListener listener;
     private int viewType = VIEW_TYPE_GRID;
+    private Set<Integer> favoriteProductIds = new HashSet<>();
 
     public interface OnProductClickListener {
         void onProductClick(Product product);
@@ -40,6 +44,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
 
     public void setViewType(int viewType) {
         this.viewType = viewType;
+        notifyDataSetChanged();
+    }
+
+    public void setFavoriteProductIds(List<Integer> ids) {
+        this.favoriteProductIds = new HashSet<>(ids);
         notifyDataSetChanged();
     }
 
@@ -108,6 +117,15 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
                 .placeholder(R.drawable.ic_placeholder)
                 .error(R.drawable.ic_placeholder)
                 .into(holder.ivProduct);
+
+        // Favorite Heart Icon
+        if (holder.ivHeart != null) {
+            if (favoriteProductIds.contains(product.getId())) {
+                holder.ivHeart.setImageResource(R.drawable.ic_heart_filled);
+            } else {
+                holder.ivHeart.setImageResource(R.drawable.ic_heart_outline);
+            }
+        }
 
         holder.itemView.setOnClickListener(v -> listener.onProductClick(product));
     }

@@ -25,6 +25,7 @@ import com.example.shoppingapp.ProductDetailActivity;
 import com.example.shoppingapp.ProductListActivity;
 import com.example.shoppingapp.R;
 import com.example.shoppingapp.SearchHistoryManager;
+import com.example.shoppingapp.SessionManager;
 import com.example.shoppingapp.adapter.HomeCategoryAdapter;
 import com.example.shoppingapp.adapter.ProductAdapter;
 import com.example.shoppingapp.database.AppDatabase;
@@ -37,6 +38,7 @@ import java.util.List;
 public class HomeFragment extends Fragment {
 
     private AppDatabase db;
+    private SessionManager sessionManager;
     private ProductAdapter productAdapter;
     private HomeCategoryAdapter categoryAdapter;
     private final List<Product> products = new ArrayList<>();
@@ -55,6 +57,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         db = AppDatabase.getInstance(requireContext());
+        sessionManager = new SessionManager(requireContext());
         searchHistoryManager = new SearchHistoryManager(requireContext());
 
         // Categories horizontal list
@@ -144,6 +147,20 @@ public class HomeFragment extends Fragment {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).updateCartBadge();
         }
+        loadFavorites(); // Tải lại danh sách yêu thích để cập nhật icon trái tim
+    }
+
+    private void loadFavorites() {
+        if (!sessionManager.isLoggedIn()) {
+            productAdapter.setFavoriteProductIds(new ArrayList<>());
+            return;
+        }
+        AppDatabase.databaseExecutor.execute(() -> {
+            List<Integer> favoriteIds = db.favoriteDao().getFavoriteProductIds(sessionManager.getUserId());
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> productAdapter.setFavoriteProductIds(favoriteIds));
+            }
+        });
     }
 
     private void showSearchHistory() {
