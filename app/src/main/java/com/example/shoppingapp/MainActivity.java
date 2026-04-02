@@ -55,7 +55,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if (savedInstanceState == null) {
-            bottomNav.setSelectedItemId(R.id.nav_home);
+            if (getIntent().getBooleanExtra("openCart", false)) {
+                bottomNav.setSelectedItemId(R.id.nav_cart);
+            } else {
+                bottomNav.setSelectedItemId(R.id.nav_home);
+            }
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent.getBooleanExtra("openCart", false)) {
+            bottomNav.setSelectedItemId(R.id.nav_cart);
         }
     }
 

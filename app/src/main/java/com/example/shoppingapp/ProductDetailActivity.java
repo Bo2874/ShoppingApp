@@ -221,8 +221,14 @@ public class ProductDetailActivity extends AppCompatActivity {
                 new AlertDialog.Builder(this)
                         .setTitle("Thêm thành công!")
                         .setMessage("Bạn muốn tiếp tục mua sắm hay xem giỏ hàng?")
-                        .setPositiveButton("Xem giỏ hàng", (dialog, which) -> finish())
-                        .setNegativeButton("Tiếp tục mua", (dialog, which) -> finish())
+                        .setPositiveButton("Xem giỏ hàng", (dialog, which) -> {
+                            Intent cartIntent = new Intent(this, MainActivity.class);
+                            cartIntent.putExtra("openCart", true);
+                            cartIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            startActivity(cartIntent);
+                            finish();
+                        })
+                        .setNegativeButton("Tiếp tục mua", null)
                         .show();
             });
         });
