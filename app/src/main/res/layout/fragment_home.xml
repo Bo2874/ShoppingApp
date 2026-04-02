@@ -2,63 +2,65 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray_bg">
+    android:background="@color/bg_light">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Header -->
+        <!-- Top Bar -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/green_primary"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_height="56dp"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="FreshMart"
-                android:textColor="@color/white"
+                android:layout_weight="1"
+                android:text="@string/explore"
+                android:textColor="@color/text_primary"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Rau củ quả tươi mỗi ngày"
-                android:textColor="#C8E6C9"
-                android:textSize="13sp" />
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_search"
+                android:contentDescription="Search" />
+        </LinearLayout>
 
-            <!-- Search Bar -->
-            <LinearLayout
-                android:id="@+id/searchBar"
+        <!-- Search Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_search_bar"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/ic_search" />
+
+            <EditText
+                android:id="@+id/etSearch"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_search_bar"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginStart="4dp"
-                    android:src="@drawable/ic_search" />
-
-                <EditText
-                    android:id="@+id/etSearch"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@android:color/transparent"
-                    android:hint="@string/search_hint"
-                    android:inputType="text"
-                    android:paddingStart="8dp"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:hint="@string/search_hint"
+                android:inputType="text"
+                android:paddingStart="8dp"
+                android:textSize="14sp" />
         </LinearLayout>
 
         <!-- Search History -->
@@ -108,7 +110,7 @@
             </HorizontalScrollView>
         </LinearLayout>
 
-        <!-- Banner -->
+        <!-- Banner Card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -130,14 +132,6 @@
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="100% hữu cơ, giao hàng trong 3 giờ"
-                android:textColor="#C8E6C9"
-                android:textSize="13sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_rounded_white"
@@ -145,7 +139,7 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
                 android:text="@string/shop_now"
-                android:textColor="@color/green_primary"
+                android:textColor="@color/primary_dark"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -165,7 +159,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/categories_title"
-                android:textColor="@color/gray_dark"
+                android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -174,7 +168,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/see_all"
-                android:textColor="@color/green_primary"
+                android:textColor="@color/primary_dark"
                 android:textSize="14sp" />
         </LinearLayout>
 
@@ -203,7 +197,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/featured_products"
-                android:textColor="@color/gray_dark"
+                android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -212,7 +206,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/see_all"
-                android:textColor="@color/green_primary"
+                android:textColor="@color/primary_dark"
                 android:textSize="14sp" />
         </LinearLayout>
 

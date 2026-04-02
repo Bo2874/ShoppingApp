@@ -25,10 +25,10 @@ public interface ProductDao {
     @Query("SELECT COUNT(*) FROM products")
     int getProductCount();
 
-    @Query("SELECT * FROM products WHERE name LIKE '%' || :query || '%'")
+    @Query("SELECT * FROM products WHERE name LIKE '%' || :query || '%' OR brand LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%'")
     List<Product> searchProducts(String query);
 
-    @Query("SELECT * FROM products WHERE name LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%'")
+    @Query("SELECT * FROM products WHERE name LIKE '%' || :query || '%' OR brand LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%'")
     List<Product> searchProductsAdvanced(String query);
 
     @Query("SELECT * FROM products LIMIT :limit")
@@ -36,4 +36,10 @@ public interface ProductDao {
 
     @Query("SELECT * FROM products WHERE categoryId = :categoryId AND id != :excludeId LIMIT :limit")
     List<Product> getRelatedProducts(int categoryId, int excludeId, int limit);
+
+    @Query("SELECT * FROM products ORDER BY rating DESC LIMIT :limit")
+    List<Product> getTopRatedProducts(int limit);
+
+    @Query("SELECT * FROM products WHERE originalPrice > 0 AND originalPrice > price LIMIT :limit")
+    List<Product> getOnSaleProducts(int limit);
 }

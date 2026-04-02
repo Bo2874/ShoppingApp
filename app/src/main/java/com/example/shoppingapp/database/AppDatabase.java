@@ -9,11 +9,13 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.shoppingapp.database.dao.CategoryDao;
+import com.example.shoppingapp.database.dao.FavoriteDao;
 import com.example.shoppingapp.database.dao.OrderDao;
 import com.example.shoppingapp.database.dao.OrderDetailDao;
 import com.example.shoppingapp.database.dao.ProductDao;
 import com.example.shoppingapp.database.dao.UserDao;
 import com.example.shoppingapp.database.entity.Category;
+import com.example.shoppingapp.database.entity.Favorite;
 import com.example.shoppingapp.database.entity.Order;
 import com.example.shoppingapp.database.entity.OrderDetail;
 import com.example.shoppingapp.database.entity.Product;
@@ -22,7 +24,7 @@ import com.example.shoppingapp.database.entity.User;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {User.class, Category.class, Product.class, Order.class, OrderDetail.class}, version = 5, exportSchema = false)
+@Database(entities = {User.class, Category.class, Product.class, Order.class, OrderDetail.class, Favorite.class}, version = 6, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract UserDao userDao();
@@ -30,6 +32,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ProductDao productDao();
     public abstract OrderDao orderDao();
     public abstract OrderDetailDao orderDetailDao();
+    public abstract FavoriteDao favoriteDao();
 
     private static volatile AppDatabase INSTANCE;
     public static final ExecutorService databaseExecutor = Executors.newFixedThreadPool(4);
@@ -60,115 +63,129 @@ public abstract class AppDatabase extends RoomDatabase {
 
                 // === Seed Users ===
                 UserDao userDao = database.userDao();
-                userDao.insert(new User("admin", "123456", "Lê Minh Tuấn", "0901234567"));
-                userDao.insert(new User("nguyenvana", "123456", "Nguyễn Văn A", "0912345678"));
-                userDao.insert(new User("tranthib", "123456", "Trần Thị B", "0923456789"));
+                User u1 = new User("nguyenvana", "123456", "Nguyễn Văn A", "0912345678");
+                u1.setEmail("nguyenvana@gmail.com");
+                userDao.insert(u1);
+                User u2 = new User("tranthib", "123456", "Trần Thị B", "0923456789");
+                u2.setEmail("tranthib@gmail.com");
+                userDao.insert(u2);
 
                 // === Seed Categories ===
                 CategoryDao categoryDao = database.categoryDao();
-                categoryDao.insert(new Category("Rau lá",
-                        "Các loại rau lá xanh tươi ngon",
-                        "https://i.imgur.com/YbH3mkk.jpg"));
-                categoryDao.insert(new Category("Củ quả",
-                        "Các loại củ quả tươi sạch",
-                        "https://i.imgur.com/Q1LGOWB.jpg"));
-                categoryDao.insert(new Category("Trái cây",
-                        "Trái cây tươi ngon mỗi ngày",
-                        "https://i.imgur.com/Ht5Ygmp.jpg"));
-                categoryDao.insert(new Category("Nấm",
-                        "Các loại nấm tươi sạch",
-                        "https://i.imgur.com/bNBFx2V.jpg"));
-                categoryDao.insert(new Category("Gia vị",
-                        "Gia vị và thảo mộc tươi",
-                        "https://i.imgur.com/PmWGV1k.jpg"));
-                categoryDao.insert(new Category("Đậu & Hạt",
-                        "Các loại đậu và hạt dinh dưỡng",
-                        "https://i.imgur.com/AHRy0rN.jpg"));
+                categoryDao.insert(new Category("Sneakers", "Giày thể thao thời trang", "https://cdn-icons-png.flaticon.com/128/2589/2589903.png"));
+                categoryDao.insert(new Category("Running", "Giày chạy bộ chuyên dụng", "https://cdn-icons-png.flaticon.com/128/2589/2589920.png"));
+                categoryDao.insert(new Category("Basketball", "Giày bóng rổ cao cấp", "https://cdn-icons-png.flaticon.com/128/3163/3163038.png"));
+                categoryDao.insert(new Category("Casual", "Giày đi hàng ngày thoải mái", "https://cdn-icons-png.flaticon.com/128/2589/2589910.png"));
+                categoryDao.insert(new Category("Boots", "Giày boot cá tính", "https://cdn-icons-png.flaticon.com/128/2310/2310760.png"));
 
                 // === Seed Products ===
                 ProductDao productDao = database.productDao();
-
-                // Rau lá (categoryId = 1)
                 Product p;
-                p = new Product("Rau cải xanh",
-                        "Rau cải xanh tươi, giàu vitamin C và chất xơ",
-                        12000, "https://i.imgur.com/YbH3mkk.jpg", "bó", 1);
-                p.setOriginalPrice(15000);
+
+                // Sneakers (categoryId = 1)
+                p = new Product("Air Max 90", "Nike", "Giày Nike Air Max 90 mang phong cách cổ điển với đệm Air Max ở gót chân, đế ngoài waffle bền bỉ. Thiết kế vượt thời gian phù hợp mọi outfit.", 2890000, "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/fd17b420-b388-4c8a-aaaa-e0a98ddf175f/air-max-90-shoes-kRsBnD.png", "đôi", 1);
+                p.setSizes("38,39,40,41,42,43");
+                p.setRating(4.8f);
+                p.setReviewCount(234);
                 productDao.insert(p);
-                productDao.insert(new Product("Xà lách",
-                        "Xà lách giòn tươi, thích hợp làm salad",
-                        12000, "https://i.imgur.com/T7C8jKQ.jpg", "bó", 1));
-                productDao.insert(new Product("Rau muống",
-                        "Rau muống xanh non, luộc hoặc xào đều ngon",
-                        10000, "https://i.imgur.com/YGJxXpz.jpg", "bó", 1));
-                productDao.insert(new Product("Bắp cải",
-                        "Bắp cải tươi xanh, giàu chất xơ",
-                        20000, "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=400", "kg", 1));
 
-                // Củ quả (categoryId = 2)
-                productDao.insert(new Product("Cà rốt",
-                        "Cà rốt tươi, giàu beta-carotene tốt cho mắt",
-                        25000, "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400", "kg", 2));
-                productDao.insert(new Product("Khoai tây",
-                        "Khoai tây sạch, thích hợp chiên, nướng, hầm",
-                        18000, "https://i.imgur.com/Q1LGOWB.jpg", "kg", 2));
-                p = new Product("Cà chua",
-                        "Cà chua chín đỏ, giàu lycopene",
-                        25000, "https://i.imgur.com/DPGZOQL.jpg", "kg", 2);
-                p.setOriginalPrice(30000);
+                p = new Product("Superstar", "Adidas", "Adidas Superstar - biểu tượng đường phố từ thập niên 70. Mũi giày vỏ sò đặc trưng, da cao cấp, đế cao su chắc chắn.", 2190000, "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/7ed0855435194229a525aad6009a0497_9366/Superstar_Shoes_White_EG4958_01_standard.jpg", "đôi", 1);
+                p.setSizes("39,40,41,42,43");
+                p.setRating(4.6f);
+                p.setReviewCount(189);
                 productDao.insert(p);
-                productDao.insert(new Product("Hành tây",
-                        "Hành tây tươi, thơm nồng đặc trưng",
-                        22000, "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=400", "kg", 2));
-                productDao.insert(new Product("Ớt chuông",
-                        "Ớt chuông đủ màu, giòn ngọt tự nhiên",
-                        45000, "https://i.imgur.com/bQm3Vyh.jpg", "kg", 2));
 
-                // Trái cây (categoryId = 3)
-                productDao.insert(new Product("Chuối",
-                        "Chuối chín vàng, giàu kali và vitamin B6",
-                        20000, "https://i.imgur.com/Ht5Ygmp.jpg", "nải", 3));
-                productDao.insert(new Product("Cam",
-                        "Cam ngọt mọng nước, giàu vitamin C",
-                        35000, "https://i.imgur.com/V0p7Iss.jpg", "kg", 3));
-                productDao.insert(new Product("Táo",
-                        "Táo đỏ giòn ngọt, nhập khẩu chất lượng",
-                        55000, "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400", "kg", 3));
-                p = new Product("Dâu tây",
-                        "Dâu tây Đà Lạt tươi, thơm ngon tự nhiên",
-                        69000, "https://i.imgur.com/e6jq8RE.jpg", "hộp", 3);
-                p.setOriginalPrice(85000);
+                p = new Product("Old Skool", "Vans", "Vans Old Skool - giày skate huyền thoại với sọc Jazz Stripe nổi bật. Chất liệu canvas và da lộn bền bỉ, đế waffle chống trượt.", 1690000, "https://images.journeys.com/images/products/1_LARGE/773-1615017-BLACK-1702406133.jpg", "đôi", 1);
+                p.setSizes("38,39,40,41,42,43,44");
+                p.setRating(4.5f);
+                p.setReviewCount(312);
                 productDao.insert(p);
-                productDao.insert(new Product("Nho",
-                        "Nho xanh không hạt, ngọt thanh mát",
-                        65000, "https://i.imgur.com/f7rMMFk.jpg", "kg", 3));
 
-                // Nấm (categoryId = 4)
-                productDao.insert(new Product("Nấm rơm",
-                        "Nấm rơm tươi, thích hợp nấu canh, xào",
-                        40000, "https://i.imgur.com/bNBFx2V.jpg", "kg", 4));
-                productDao.insert(new Product("Nấm đùi gà",
-                        "Nấm đùi gà trắng, giòn dai thơm ngon",
-                        50000, "https://i.imgur.com/T7yIqso.jpg", "kg", 4));
+                p = new Product("Chuck Taylor All Star", "Converse", "Converse Chuck Taylor All Star - đôi giày kinh điển nhất mọi thời đại. Canvas bền, đế cao su vulcanized, phù hợp mọi phong cách.", 1490000, "https://www.converse.com/dw/image/v2/BCZC_PRD/on/demandware.static/-/Sites-cnv-master-catalog/default/dw1cb70a6c/images/a_107/M9166_A_107X1.jpg", "đôi", 1);
+                p.setSizes("37,38,39,40,41,42,43");
+                p.setRating(4.7f);
+                p.setReviewCount(456);
+                productDao.insert(p);
 
-                // Gia vị (categoryId = 5)
-                productDao.insert(new Product("Gừng",
-                        "Gừng tươi, vị cay nồng, tốt cho sức khỏe",
-                        30000, "https://i.imgur.com/PmWGV1k.jpg", "kg", 5));
-                productDao.insert(new Product("Húng quế",
-                        "Húng quế thơm, dùng ăn kèm phở, bún",
-                        5000, "https://i.imgur.com/3zB7kpC.jpg", "bó", 5));
-                productDao.insert(new Product("Sả",
-                        "Sả tươi thơm, gia vị không thể thiếu",
-                        8000, "https://i.imgur.com/LR1kwRj.jpg", "bó", 5));
+                // Running (categoryId = 2)
+                p = new Product("Ultraboost Light", "Adidas", "Adidas Ultraboost Light - công nghệ BOOST mang lại cảm giác đàn hồi tuyệt vời. Primeknit ôm chân, hỗ trợ tối đa khi chạy.", 4290000, "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/c17d241f82c04e2b879faf1600f8ac0c_9366/Ultraboost_Light_Running_Shoes_Grey_HQ6339_01_standard.jpg", "đôi", 2);
+                p.setOriginalPrice(5290000);
+                p.setSizes("39,40,41,42,43,44");
+                p.setRating(4.9f);
+                p.setReviewCount(178);
+                productDao.insert(p);
 
-                // Đậu & Hạt (categoryId = 6)
-                productDao.insert(new Product("Đậu phộng",
-                        "Đậu phộng rang muối, giàu protein",
-                        35000, "https://i.imgur.com/AHRy0rN.jpg", "kg", 6));
-                productDao.insert(new Product("Đậu đen",
-                        "Đậu đen hữu cơ, nấu chè, nấu cháo",
-                        28000, "https://i.imgur.com/Cq0jMxG.jpg", "kg", 6));
+                p = new Product("Air Zoom Pegasus 40", "Nike", "Nike Pegasus 40 - đôi giày chạy đáng tin cậy nhất. Zoom Air êm ái, lưới thoáng khí, phù hợp cả chạy bộ và tập gym.", 3190000, "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/a72a18c2-2c18-4c2f-852d-c9a1e4e2ef65/pegasus-40-road-running-shoes-zDx9lM.png", "đôi", 2);
+                p.setSizes("39,40,41,42,43");
+                p.setRating(4.7f);
+                p.setReviewCount(267);
+                productDao.insert(p);
+
+                p = new Product("Fresh Foam 1080v13", "New Balance", "New Balance 1080v13 - đệm Fresh Foam X dày dặn, Hypoknit ôm chân mềm mại. Hoàn hảo cho chạy đường dài.", 3890000, "https://nb.scene7.com/is/image/NB/m1080v13_nb_02_i?$pdpflexf2$&wid=440&hei=440", "đôi", 2);
+                p.setSizes("40,41,42,43,44");
+                p.setRating(4.8f);
+                p.setReviewCount(145);
+                productDao.insert(p);
+
+                // Basketball (categoryId = 3)
+                p = new Product("LeBron XXI", "Nike", "Nike LeBron 21 - công nghệ Zoom Air kép cho khả năng bật nhảy vượt trội. Thiết kế hầm hố, bám sân tối đa.", 5490000, "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/0d2d tried-ec3c-4ef5-932f-c8a99b106070/lebron-xxi-shoes.png", "đôi", 3);
+                p.setOriginalPrice(6490000);
+                p.setSizes("40,41,42,43,44,45");
+                p.setRating(4.9f);
+                p.setReviewCount(89);
+                productDao.insert(p);
+
+                p = new Product("Curry 11", "Under Armour", "Under Armour Curry 11 - nhẹ nhàng, linh hoạt với UA Flow không đế cao su. Traction tuyệt vời, hỗ trợ mắt cá chân.", 4290000, "https://underarmour.scene7.com/is/image/Underarmour/3026615-100_DEFAULT?rp=standard-30pad%7CpdpMainDesktop&scl=1&fmt=jpg&qlt=85&resMode=sharp2&cache=on%2Con&bgc=f0f0f0&wid=566&hei=566&size=536%2C536", "đôi", 3);
+                p.setSizes("40,41,42,43,44");
+                p.setRating(4.6f);
+                p.setReviewCount(67);
+                productDao.insert(p);
+
+                p = new Product("Harden Vol. 8", "Adidas", "Adidas Harden Vol. 8 - Boost cushioning cho bước di chuyển tự tin. Đế ngoài Continental cho độ bám đỉnh cao.", 3790000, "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/e2e28bc9e26b4de2a903afee013e3730_9366/Harden_Vol._8_Shoes_Blue_IH2670_01_standard.jpg", "đôi", 3);
+                p.setSizes("40,41,42,43,44,45");
+                p.setRating(4.5f);
+                p.setReviewCount(54);
+                productDao.insert(p);
+
+                // Casual (categoryId = 4)
+                p = new Product("Stan Smith", "Adidas", "Adidas Stan Smith - thiết kế tối giản, thanh lịch. Da premium mềm mại, đế cupsole thoải mái, biểu tượng thời trang bền vững.", 2490000, "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/0849c8f0328a4f2f994aad6800b9b0ca_9366/Stan_Smith_Shoes_White_FX5502_01_standard.jpg", "đôi", 4);
+                p.setSizes("37,38,39,40,41,42,43");
+                p.setRating(4.7f);
+                p.setReviewCount(523);
+                productDao.insert(p);
+
+                p = new Product("Gazelle", "Adidas", "Adidas Gazelle - phong cách retro từ thập niên 90 trở lại. Da lộn mềm, đế gum classic, phối màu đa dạng.", 2290000, "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/2e6e7e2a1b2e4c35b228aedd0113b230_9366/Gazelle_Shoes_Blue_IG2090_01_standard.jpg", "đôi", 4);
+                p.setOriginalPrice(2690000);
+                p.setSizes("38,39,40,41,42,43");
+                p.setRating(4.6f);
+                p.setReviewCount(287);
+                productDao.insert(p);
+
+                p = new Product("Club C 85", "Reebok", "Reebok Club C 85 - giày tennis cổ điển, da mềm trắng tinh, đế thấp thoải mái. Phù hợp phong cách smart casual.", 1890000, "https://images.reebok.eu/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/e3a3d1c5e9d54f2e8d4fa6cb01174a42_9366/Club_C_85_Shoes_White_AR0456_01_standard.jpg", "đôi", 4);
+                p.setSizes("38,39,40,41,42,43");
+                p.setRating(4.4f);
+                p.setReviewCount(198);
+                productDao.insert(p);
+
+                // Boots (categoryId = 5)
+                p = new Product("6-Inch Premium Boot", "Timberland", "Timberland 6-Inch Premium - biểu tượng boot vượt thời gian. Da nubuck chống nước, đế lug chắc chắn, đệm êm cả ngày.", 4890000, "https://images.timberland.com/is/image/TimberlandEU/10061713-hero?wid=720&hei=720&fit=constrain,1&qlt=85,1&op_usm=1,1,6,0", "đôi", 5);
+                p.setSizes("39,40,41,42,43,44");
+                p.setRating(4.8f);
+                p.setReviewCount(345);
+                productDao.insert(p);
+
+                p = new Product("1460 Smooth", "Dr. Martens", "Dr. Martens 1460 - 8 lỗ xỏ dây kinh điển. Da Smooth bóng, đế AirWair đàn hồi, welt vàng đặc trưng. Bền bỉ theo năm tháng.", 4290000, "https://i1.adis.ws/i/drmartens/11822006.88.jpg?$large$", "đôi", 5);
+                p.setSizes("38,39,40,41,42,43");
+                p.setRating(4.7f);
+                p.setReviewCount(267);
+                productDao.insert(p);
+
+                p = new Product("Chelsea Boot", "Dr. Martens", "Dr. Martens 2976 Chelsea Boot - thiết kế slip-on tiện lợi với miếng đàn hồi hai bên. Da nappa mềm, đế bouncing sole.", 3990000, "https://i1.adis.ws/i/drmartens/22227001.88.jpg?$large$", "đôi", 5);
+                p.setOriginalPrice(4590000);
+                p.setSizes("38,39,40,41,42,43");
+                p.setRating(4.6f);
+                p.setReviewCount(189);
+                productDao.insert(p);
             });
         }
     };

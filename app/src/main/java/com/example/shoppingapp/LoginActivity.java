@@ -1,6 +1,8 @@
 package com.example.shoppingapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -8,13 +10,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.shoppingapp.database.AppDatabase;
 import com.example.shoppingapp.database.entity.User;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private TextInputEditText etUsername, etPassword;
-    private TextInputLayout tilUsername, tilPassword;
+    private EditText etUsername, etPassword;
     private AppDatabase db;
     private SessionManager sessionManager;
 
@@ -26,56 +25,44 @@ public class LoginActivity extends AppCompatActivity {
         db = AppDatabase.getInstance(this);
         sessionManager = new SessionManager(this);
 
-        tilUsername = findViewById(R.id.tilUsername);
-        tilPassword = findViewById(R.id.tilPassword);
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
-        TextView btnDoLogin = findViewById(R.id.btnDoLogin);
+        TextView btnLogin = findViewById(R.id.btnLogin);
+        TextView tvGoRegister = findViewById(R.id.tvGoRegister);
 
-        btnDoLogin.setOnClickListener(v -> doLogin());
+        btnLogin.setOnClickListener(v -> doLogin());
+
+        tvGoRegister.setOnClickListener(v ->
+                startActivity(new Intent(this, RegisterActivity.class)));
     }
 
     private void doLogin() {
-        // Reset errors
-        tilUsername.setError(null);
-        tilPassword.setError(null);
+        String username = etUsername.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
 
-        String username = etUsername.getText() != null ? etUsername.getText().toString().trim() : "";
-        String password = etPassword.getText() != null ? etPassword.getText().toString().trim() : "";
-
-        // === VALIDATION ===
         boolean hasError = false;
 
-        if (username.isEmpty()) {
-            tilUsername.setError("Vui lòng nhập tên đăng nhập");
-            hasError = true;
-        } else if (username.length() < 3) {
-            tilUsername.setError("Tên đăng nhập phải có ít nhất 3 ký tự");
+        if (username.length() < 3) {
+            etUsername.setError("Tên đăng nhập phải có ít nhất 3 ký tự");
             hasError = true;
         }
 
-        if (password.isEmpty()) {
-            tilPassword.setError("Vui lòng nhập mật khẩu");
-            hasError = true;
-        } else if (password.length() < 6) {
-            tilPassword.setError("Mật khẩu phải có ít nhất 6 ký tự");
+        if (password.length() < 6) {
+            etPassword.setError("Mật khẩu phải có ít nhất 6 ký tự");
             hasError = true;
         }
 
         if (hasError) return;
 
-        // === LOGIN ===
         AppDatabase.databaseExecutor.execute(() -> {
             User user = db.userDao().login(username, password);
             runOnUiThread(() -> {
                 if (user != null) {
                     sessionManager.createLoginSession(user.getId(), user.getUsername(), user.getFullName());
-                    Toast.makeText(this, "Đăng nhập thành công! Xin chào " + user.getFullName(), Toast.LENGTH_SHORT).show();
                     setResult(RESULT_OK);
                     finish();
                 } else {
-                    tilPassword.setError("Sai tên đăng nhập hoặc mật khẩu");
-                    Toast.makeText(this, "Thông tin đăng nhập không chính xác", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Sai tên đăng nhập hoặc mật khẩu", Toast.LENGTH_SHORT).show();
                 }
             });
         });

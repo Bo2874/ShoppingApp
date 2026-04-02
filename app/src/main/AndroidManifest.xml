@@ -25,6 +25,7 @@
         </activity>
 
         <activity android:name=".LoginActivity" />
+        <activity android:name=".RegisterActivity" />
         <activity android:name=".ProductListActivity" />
         <activity android:name=".ProductDetailActivity" />
         <activity android:name=".InvoiceActivity" />

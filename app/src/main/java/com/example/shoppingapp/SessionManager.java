@@ -9,6 +9,7 @@ public class SessionManager {
     private static final String KEY_USER_ID = "userId";
     private static final String KEY_USERNAME = "username";
     private static final String KEY_FULL_NAME = "fullName";
+    private static final String KEY_EMAIL = "email";
 
     private final SharedPreferences prefs;
     private final SharedPreferences.Editor editor;
@@ -40,6 +41,15 @@ public class SessionManager {
 
     public String getFullName() {
         return prefs.getString(KEY_FULL_NAME, "");
+    }
+
+    public String getEmail() {
+        return prefs.getString(KEY_EMAIL, "");
+    }
+
+    public void setEmail(String email) {
+        editor.putString(KEY_EMAIL, email);
+        editor.apply();
     }
 
     public void logout() {

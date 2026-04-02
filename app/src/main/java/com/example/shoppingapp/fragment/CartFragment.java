@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shoppingapp.CheckoutActivity;
+import com.example.shoppingapp.MainActivity;
 import com.example.shoppingapp.R;
 import com.example.shoppingapp.SessionManager;
 import com.example.shoppingapp.adapter.CartAdapter;
@@ -97,7 +98,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
                             itemView.getRight(), itemView.getBottom());
                     c.drawRoundRect(background, cornerRadius, cornerRadius, paint);
 
-                    // Draw "Xóa" text
+                    // Draw "Xoa" text
                     Paint textPaint = new Paint();
                     textPaint.setColor(Color.WHITE);
                     textPaint.setTextSize(14 * recyclerView.getContext().getResources().getDisplayMetrics().scaledDensity);
@@ -115,8 +116,8 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
         view.findViewById(R.id.btnCheckout).setOnClickListener(v -> checkout());
 
         view.findViewById(R.id.btnStartShopping).setOnClickListener(v -> {
-            if (getActivity() instanceof com.example.shoppingapp.MainActivity) {
-                ((com.example.shoppingapp.MainActivity) getActivity()).switchToTab(R.id.nav_home);
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).switchToTab(R.id.nav_home);
             }
         });
     }
@@ -196,6 +197,9 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
                     item.setQuantity(newQuantity);
                     adapter.notifyDataSetChanged();
                     updateTotal(total);
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).updateCartBadge();
+                    }
                 });
             }
         });
@@ -223,7 +227,12 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
                 db.orderDao().update(order);
             }
             if (getActivity() != null) {
-                getActivity().runOnUiThread(this::loadCart);
+                getActivity().runOnUiThread(() -> {
+                    loadCart();
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).updateCartBadge();
+                    }
+                });
             }
         });
     }
@@ -239,7 +248,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
             return;
         }
 
-        // Navigate to CheckoutActivity
+        // Navigate to CheckoutActivity with orderId
         Intent intent = new Intent(requireContext(), CheckoutActivity.class);
         intent.putExtra("orderId", orderId);
         startActivity(intent);

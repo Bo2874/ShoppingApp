@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.example.shoppingapp.R;
 import com.example.shoppingapp.database.entity.Category;
 
@@ -20,6 +19,7 @@ public class HomeCategoryAdapter extends RecyclerView.Adapter<HomeCategoryAdapte
 
     private final List<Category> categories;
     private final OnCategoryClickListener listener;
+    private int selectedPosition = 0;
 
     public interface OnCategoryClickListener {
         void onCategoryClick(Category category);
@@ -34,7 +34,7 @@ public class HomeCategoryAdapter extends RecyclerView.Adapter<HomeCategoryAdapte
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_category_home, parent, false);
+                .inflate(R.layout.item_home_category, parent, false);
         return new ViewHolder(view);
     }
 
@@ -45,12 +45,26 @@ public class HomeCategoryAdapter extends RecyclerView.Adapter<HomeCategoryAdapte
 
         Glide.with(holder.itemView.getContext())
                 .load(category.getImageUrl())
-                .transform(new CircleCrop())
-                .placeholder(R.drawable.ic_placeholder)
-                .error(R.drawable.ic_placeholder)
-                .into(holder.ivCategory);
+                .placeholder(R.drawable.ic_category)
+                .error(R.drawable.ic_category)
+                .into(holder.ivIcon);
 
-        holder.itemView.setOnClickListener(v -> listener.onCategoryClick(category));
+        if (position == selectedPosition) {
+            holder.itemView.setBackgroundResource(R.drawable.bg_category_chip_selected);
+            holder.tvName.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.white, null));
+        } else {
+            holder.itemView.setBackgroundResource(R.drawable.bg_category_chip);
+            holder.tvName.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.text_primary, null));
+        }
+
+        holder.itemView.setOnClickListener(v -> {
+            int adapterPosition = holder.getAdapterPosition();
+            if (adapterPosition != RecyclerView.NO_POSITION) {
+                selectedPosition = adapterPosition;
+                notifyDataSetChanged();
+                listener.onCategoryClick(category);
+            }
+        });
     }
 
     @Override
@@ -59,13 +73,13 @@ public class HomeCategoryAdapter extends RecyclerView.Adapter<HomeCategoryAdapte
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView ivCategory;
+        ImageView ivIcon;
         TextView tvName;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivCategory = itemView.findViewById(R.id.ivCategoryHome);
-            tvName = itemView.findViewById(R.id.tvCategoryHomeName);
+            ivIcon = itemView.findViewById(R.id.ivCategoryIcon);
+            tvName = itemView.findViewById(R.id.tvCategoryName);
         }
     }
 }

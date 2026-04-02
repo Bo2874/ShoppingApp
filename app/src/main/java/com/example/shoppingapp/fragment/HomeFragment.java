@@ -79,9 +79,8 @@ public class HomeFragment extends Fragment {
 
         // See all buttons
         view.findViewById(R.id.tvSeeAllCategories).setOnClickListener(v -> {
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).switchToTab(R.id.nav_category);
-            }
+            Intent intent = new Intent(requireContext(), ProductListActivity.class);
+            startActivity(intent);
         });
 
         view.findViewById(R.id.tvSeeAllProducts).setOnClickListener(v -> {

@@ -64,8 +64,15 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Product product = products.get(position);
         holder.tvName.setText(product.getName());
+
+        // Brand
+        if (holder.tvBrand != null) {
+            holder.tvBrand.setText(product.getBrand());
+        }
+
+        // Price formatted Vietnamese locale
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        holder.tvPrice.setText(formatter.format(product.getPrice()) + "đ/" + product.getUnit());
+        holder.tvPrice.setText(formatter.format(product.getPrice()) + "đ");
 
         // Sale badge and original price
         if (product.isOnSale()) {
@@ -84,11 +91,17 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             if (holder.tvSaleBadge != null) holder.tvSaleBadge.setVisibility(View.GONE);
         }
 
+        // Rating
+        if (holder.tvRating != null) {
+            holder.tvRating.setText(String.valueOf(product.getRating()));
+        }
+
         // Description (list view only)
         if (holder.tvDescription != null) {
             holder.tvDescription.setText(product.getDescription());
         }
 
+        // Image
         Glide.with(holder.itemView.getContext())
                 .load(product.getImageUrl())
                 .transform(new CenterCrop(), new RoundedCorners(16))
@@ -112,7 +125,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivProduct;
-        TextView tvName, tvPrice, tvOriginalPrice, tvSaleBadge, tvDescription;
+        ImageView ivHeart;
+        TextView tvName, tvPrice, tvOriginalPrice, tvSaleBadge, tvDescription, tvBrand, tvRating;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -122,6 +136,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             tvOriginalPrice = itemView.findViewById(R.id.tvOriginalPrice);
             tvSaleBadge = itemView.findViewById(R.id.tvSaleBadge);
             tvDescription = itemView.findViewById(R.id.tvProductDescription);
+            tvBrand = itemView.findViewById(R.id.tvProductBrand);
+            tvRating = itemView.findViewById(R.id.tvRating);
+            ivHeart = itemView.findViewById(R.id.ivHeart);
         }
     }
 }

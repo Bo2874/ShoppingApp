@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import com.example.shoppingapp.database.AppDatabase;
 import com.example.shoppingapp.database.entity.Order;
 import com.example.shoppingapp.fragment.CartFragment;
-import com.example.shoppingapp.fragment.CategoryListFragment;
+import com.example.shoppingapp.fragment.FavoriteFragment;
 import com.example.shoppingapp.fragment.HomeFragment;
 import com.example.shoppingapp.fragment.ProfileFragment;
 import com.google.android.material.badge.BadgeDrawable;
@@ -40,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_home) {
                 fragment = new HomeFragment();
-            } else if (itemId == R.id.nav_category) {
-                fragment = new CategoryListFragment();
+            } else if (itemId == R.id.nav_favorite) {
+                fragment = new FavoriteFragment();
             } else if (itemId == R.id.nav_cart) {
                 fragment = new CartFragment();
             } else if (itemId == R.id.nav_profile) {
