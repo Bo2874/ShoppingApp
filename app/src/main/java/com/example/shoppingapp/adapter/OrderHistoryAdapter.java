@@ -48,6 +48,7 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
         String statusText;
         switch (order.getStatus()) {
             case "Paid": statusText = "Đã thanh toán"; break;
+            case "Delivering": statusText = "Đang giao hàng"; break;
             case "Pending": statusText = "Chờ thanh toán"; break;
             default: statusText = order.getStatus();
         }

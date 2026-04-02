@@ -22,7 +22,7 @@ import com.example.shoppingapp.database.entity.User;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {User.class, Category.class, Product.class, Order.class, OrderDetail.class}, version = 4, exportSchema = false)
+@Database(entities = {User.class, Category.class, Product.class, Order.class, OrderDetail.class}, version = 5, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract UserDao userDao();
@@ -60,7 +60,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
                 // === Seed Users ===
                 UserDao userDao = database.userDao();
-                userDao.insert(new User("admin", "123456", "Quản trị viên", "0901234567"));
+                userDao.insert(new User("admin", "123456", "Lê Minh Tuấn", "0901234567"));
                 userDao.insert(new User("nguyenvana", "123456", "Nguyễn Văn A", "0912345678"));
                 userDao.insert(new User("tranthib", "123456", "Trần Thị B", "0923456789"));
 

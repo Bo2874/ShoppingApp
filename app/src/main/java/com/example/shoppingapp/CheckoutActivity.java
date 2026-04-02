@@ -130,7 +130,7 @@ public class CheckoutActivity extends AppCompatActivity {
         AppDatabase.databaseExecutor.execute(() -> {
             Order order = db.orderDao().getOrderById(orderId);
             if (order == null) return;
-            order.setStatus("Paid");
+            order.setStatus(paymentMethod.equals("COD") ? "Delivering" : "Paid");
             order.setAddress(address);
             order.setPaymentMethod(paymentMethod);
             db.orderDao().update(order);

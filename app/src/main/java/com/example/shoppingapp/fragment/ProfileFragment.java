@@ -35,10 +35,10 @@ public class ProfileFragment extends Fragment {
     private LinearLayout layoutNotLoggedIn;
     private ScrollView layoutLoggedIn;
     private TextView tvProfileName, tvProfileUsername, tvNoOrders;
-    private TextView chipAll, chipPaid;
+    private TextView chipAll, chipDelivering, chipPaid;
     private OrderHistoryAdapter orderAdapter;
     private final List<Order> orders = new ArrayList<>();
-    private String currentFilter = "all"; // "all" or "Paid"
+    private String currentFilter = "all";
 
     private final ActivityResultLauncher<Intent> loginLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -65,9 +65,11 @@ public class ProfileFragment extends Fragment {
 
         // Filter chips
         chipAll = view.findViewById(R.id.chipAll);
+        chipDelivering = view.findViewById(R.id.chipDelivering);
         chipPaid = view.findViewById(R.id.chipPaid);
 
         chipAll.setOnClickListener(v -> selectFilter("all"));
+        chipDelivering.setOnClickListener(v -> selectFilter("Delivering"));
         chipPaid.setOnClickListener(v -> selectFilter("Paid"));
 
         view.findViewById(R.id.btnGoLogin).setOnClickListener(v ->
@@ -96,18 +98,19 @@ public class ProfileFragment extends Fragment {
 
     private void selectFilter(String filter) {
         currentFilter = filter;
-        // Update chip styles
-        if (filter.equals("all")) {
-            chipAll.setBackgroundResource(R.drawable.bg_chip_selected);
-            chipAll.setTextColor(getResources().getColor(R.color.white, null));
-            chipPaid.setBackgroundResource(R.drawable.bg_chip_normal);
-            chipPaid.setTextColor(getResources().getColor(R.color.gray_dark, null));
-        } else {
-            chipAll.setBackgroundResource(R.drawable.bg_chip_normal);
-            chipAll.setTextColor(getResources().getColor(R.color.gray_dark, null));
-            chipPaid.setBackgroundResource(R.drawable.bg_chip_selected);
-            chipPaid.setTextColor(getResources().getColor(R.color.white, null));
+        // Reset all chips
+        TextView[] chips = {chipAll, chipDelivering, chipPaid};
+        for (TextView chip : chips) {
+            chip.setBackgroundResource(R.drawable.bg_chip_normal);
+            chip.setTextColor(getResources().getColor(R.color.gray_dark, null));
         }
+        // Highlight selected
+        TextView selected;
+        if (filter.equals("Delivering")) selected = chipDelivering;
+        else if (filter.equals("Paid")) selected = chipPaid;
+        else selected = chipAll;
+        selected.setBackgroundResource(R.drawable.bg_chip_selected);
+        selected.setTextColor(getResources().getColor(R.color.white, null));
         loadOrderHistory();
     }
 
@@ -127,10 +130,10 @@ public class ProfileFragment extends Fragment {
     private void loadOrderHistory() {
         AppDatabase.databaseExecutor.execute(() -> {
             List<Order> result;
-            if (currentFilter.equals("Paid")) {
-                result = db.orderDao().getPaidOrders(sessionManager.getUserId());
-            } else {
+            if (currentFilter.equals("all")) {
                 result = db.orderDao().getCompletedOrders(sessionManager.getUserId());
+            } else {
+                result = db.orderDao().getOrdersByStatus(sessionManager.getUserId(), currentFilter);
             }
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> {

@@ -171,6 +171,19 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/chipDelivering"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/bg_chip_normal"
+                        android:gravity="center"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:text="Đang giao"
+                        android:textColor="@color/gray_dark"
+                        android:textSize="13sp" />
+
+                    <TextView
                         android:id="@+id/chipPaid"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"

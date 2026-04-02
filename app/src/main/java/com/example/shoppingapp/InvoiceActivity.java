@@ -92,7 +92,13 @@ public class InvoiceActivity extends AppCompatActivity {
                 tvInvoiceId.setText("Mã đơn hàng: #" + order.getId());
                 tvInvoiceDate.setText("Ngày: " + order.getOrderDate());
                 tvInvoiceCustomer.setText("Khách hàng: " + (user != null ? user.getFullName() : "N/A"));
-                tvInvoiceStatus.setText(order.getStatus().equals("Paid") ? "Đã thanh toán" : order.getStatus());
+                String statusText;
+                switch (order.getStatus()) {
+                    case "Paid": statusText = "Đã thanh toán"; break;
+                    case "Delivering": statusText = "Đang giao hàng"; break;
+                    default: statusText = order.getStatus();
+                }
+                tvInvoiceStatus.setText(statusText);
                 tvInvoiceTotal.setText(formatter.format(order.getTotalAmount()) + "đ");
 
                 // Show address if available
