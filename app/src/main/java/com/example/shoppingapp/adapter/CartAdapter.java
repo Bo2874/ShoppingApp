@@ -50,46 +50,76 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        OrderDetail item = items.get(position);
-        Product product = productMap.get(item.getProductId());
-        Context context = holder.itemView.getContext();
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-
-        if (product != null) {
-            holder.tvName.setText(product.getName());
-            holder.tvPrice.setText(formatter.format(product.getPrice()) + "đ/" + product.getUnit());
+        try {
+            if (position < 0 || position >= items.size()) {
+                return;
+            }
             
-            // Logic load ảnh nội bộ cho Cart
-            Object imageSource = product.getImageUrl();
-            if (product.getImageUrl() != null && product.getImageUrl().startsWith("res://drawable/")) {
-                String resName = product.getImageUrl().replace("res://drawable/", "");
-                int resId = context.getResources().getIdentifier(resName, "drawable", context.getPackageName());
-                if (resId != 0) imageSource = resId;
+            OrderDetail item = items.get(position);
+            if (item == null) {
+                return;
+            }
+            
+            Product product = productMap.get(item.getProductId());
+            Context context = holder.itemView.getContext();
+            NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+
+            if (product != null) {
+                holder.tvName.setText(product.getName());
+                holder.tvPrice.setText(formatter.format(product.getPrice()) + "đ/" + product.getUnit());
+                
+                // Logic load ảnh nội bộ cho Cart
+                Object imageSource = product.getImageUrl();
+                if (product.getImageUrl() != null && product.getImageUrl().startsWith("res://drawable/")) {
+                    String resName = product.getImageUrl().replace("res://drawable/", "");
+                    int resId = context.getResources().getIdentifier(resName, "drawable", context.getPackageName());
+                    if (resId != 0) imageSource = resId;
+                }
+
+                Glide.with(context)
+                        .load(imageSource)
+                        .transform(new CenterCrop(), new RoundedCorners(12))
+                        .placeholder(R.drawable.ic_placeholder)
+                        .error(R.drawable.ic_placeholder)
+                        .into(holder.ivProduct);
             }
 
-            Glide.with(context)
-                    .load(imageSource)
-                    .transform(new CenterCrop(), new RoundedCorners(12))
-                    .placeholder(R.drawable.ic_placeholder)
-                    .error(R.drawable.ic_placeholder)
-                    .into(holder.ivProduct);
+            holder.tvQuantity.setText(String.valueOf(item.getQuantity()));
+            double subtotal = item.getQuantity() * item.getUnitPrice();
+            holder.tvSubtotal.setText(formatter.format(subtotal) + "đ");
+
+            holder.btnMinus.setOnClickListener(v -> {
+                try {
+                    if (item != null && item.getQuantity() > 1 && listener != null) {
+                        listener.onQuantityChanged(item, item.getQuantity() - 1);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
+            holder.btnPlus.setOnClickListener(v -> {
+                try {
+                    if (item != null && listener != null) {
+                        listener.onQuantityChanged(item, item.getQuantity() + 1);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
+            holder.btnDelete.setOnClickListener(v -> {
+                try {
+                    if (item != null && listener != null) {
+                        listener.onItemDeleted(item);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        holder.tvQuantity.setText(String.valueOf(item.getQuantity()));
-        double subtotal = item.getQuantity() * item.getUnitPrice();
-        holder.tvSubtotal.setText(formatter.format(subtotal) + "đ");
-
-        holder.btnMinus.setOnClickListener(v -> {
-            if (item.getQuantity() > 1) {
-                listener.onQuantityChanged(item, item.getQuantity() - 1);
-            }
-        });
-
-        holder.btnPlus.setOnClickListener(v -> {
-            listener.onQuantityChanged(item, item.getQuantity() + 1);
-        });
-
-        holder.btnDelete.setOnClickListener(v -> listener.onItemDeleted(item));
     }
 
     @Override

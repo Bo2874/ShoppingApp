@@ -27,6 +27,7 @@ public class Product {
     private String sizes; // comma-separated: "38,39,40,41,42"
     private float rating;
     private int reviewCount;
+    private int stockQuantity; // Trường số lượng tồn kho
 
     public Product(String name, String brand, String description, double price, String imageUrl, String unit, int categoryId) {
         this.name = name;
@@ -40,6 +41,7 @@ public class Product {
         this.sizes = "38,39,40,41,42,43";
         this.rating = 4.5f;
         this.reviewCount = 0;
+        this.stockQuantity = 50; // Mặc định là 50
     }
 
     public int getId() { return id; }
@@ -66,5 +68,8 @@ public class Product {
     public void setRating(float rating) { this.rating = rating; }
     public int getReviewCount() { return reviewCount; }
     public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
+    public int getStockQuantity() { return stockQuantity; }
+    public void setStockQuantity(int stockQuantity) { this.stockQuantity = stockQuantity; }
     public boolean isOnSale() { return originalPrice > 0 && originalPrice > price; }
+    public boolean isSoldOut() { return stockQuantity <= 0; }
 }

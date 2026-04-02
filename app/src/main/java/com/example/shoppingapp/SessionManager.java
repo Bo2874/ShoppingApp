@@ -34,6 +34,7 @@ public class SessionManager {
     public int getUserId() { return prefs.getInt(KEY_USER_ID, -1); }
     public String getUsername() { return prefs.getString(KEY_USERNAME, ""); }
     public String getFullName() { return prefs.getString(KEY_FULL_NAME, ""); }
+    public String getUserFullName() { return prefs.getString(KEY_FULL_NAME, ""); }
     public String getEmail() { return prefs.getString(KEY_EMAIL, ""); }
     public String getPhone() { return prefs.getString(KEY_PHONE, ""); }
 

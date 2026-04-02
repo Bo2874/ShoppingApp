@@ -14,8 +14,8 @@ import com.google.android.material.textfield.TextInputLayout;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private TextInputEditText etFullName, etUsername, etPassword, etPhone;
-    private TextInputLayout tilFullName, tilUsername, tilPassword, tilPhone;
+    private TextInputEditText etFullName, etUsername, etPassword, etConfirmPassword, etPhone;
+    private TextInputLayout tilFullName, tilUsername, tilPassword, tilConfirmPassword, tilPhone;
     private AppDatabase db;
 
     @Override
@@ -30,12 +30,14 @@ public class RegisterActivity extends AppCompatActivity {
         tilPhone = findViewById(R.id.tilPhone);
         tilUsername = findViewById(R.id.tilUsername);
         tilPassword = findViewById(R.id.tilPassword);
+        tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
 
         // TextInputEditTexts
         etFullName = findViewById(R.id.etFullName);
         etPhone = findViewById(R.id.etPhone);
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
+        etConfirmPassword = findViewById(R.id.etConfirmPassword);
 
         Button btnRegister = findViewById(R.id.btnRegister);
         TextView tvLoginLink = findViewById(R.id.tvLoginLink);
@@ -49,6 +51,7 @@ public class RegisterActivity extends AppCompatActivity {
         String phone = etPhone.getText().toString().trim();
         String username = etUsername.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
+        String confirmPassword = etConfirmPassword.getText().toString().trim();
 
         boolean hasError = false;
 
@@ -80,10 +83,16 @@ public class RegisterActivity extends AppCompatActivity {
             tilPassword.setError(null);
         }
 
+        if (!confirmPassword.equals(password)) {
+            tilConfirmPassword.setError("Mật khẩu xác nhận không khớp");
+            hasError = true;
+        } else {
+            tilConfirmPassword.setError(null);
+        }
+
         if (hasError) return;
 
         AppDatabase.databaseExecutor.execute(() -> {
-            // Check if user exists
             User existing = db.userDao().getUserByUsername(username);
             if (existing != null) {
                 runOnUiThread(() -> Toast.makeText(this, "Tên đăng nhập đã tồn tại", Toast.LENGTH_SHORT).show());

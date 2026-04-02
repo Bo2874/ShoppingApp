@@ -99,7 +99,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             holder.tvDescription.setText(product.getDescription());
         }
 
-        // Logic load ảnh sửa lại ở đây
+        // Logic load ảnh sửa lại
         Object imageSource = product.getImageUrl();
         if (product.getImageUrl() != null && product.getImageUrl().startsWith("res://drawable/")) {
             String resName = product.getImageUrl().replace("res://drawable/", "");
@@ -114,6 +114,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
                 .error(R.drawable.ic_placeholder)
                 .into(holder.ivProduct);
 
+        // Favorite Heart Icon
         if (holder.ivHeart != null) {
             if (favoriteProductIds.contains(product.getId())) {
                 holder.ivHeart.setImageResource(R.drawable.ic_heart_filled);
@@ -122,7 +123,19 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             }
         }
 
-        holder.itemView.setOnClickListener(v -> listener.onProductClick(product));
+        // --- Xử lý SOLD OUT ---
+        if (product.isSoldOut()) {
+            if (holder.viewSoldOutOverlay != null) holder.viewSoldOutOverlay.setVisibility(View.VISIBLE);
+            if (holder.tvSoldOut != null) holder.tvSoldOut.setVisibility(View.VISIBLE);
+            holder.itemView.setAlpha(0.7f); // Làm mờ đi một chút
+            holder.itemView.setEnabled(false); // Không cho click vào sản phẩm hết hàng
+        } else {
+            if (holder.viewSoldOutOverlay != null) holder.viewSoldOutOverlay.setVisibility(View.GONE);
+            if (holder.tvSoldOut != null) holder.tvSoldOut.setVisibility(View.GONE);
+            holder.itemView.setAlpha(1.0f);
+            holder.itemView.setEnabled(true);
+            holder.itemView.setOnClickListener(v -> listener.onProductClick(product));
+        }
     }
 
     @Override
@@ -139,7 +152,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivProduct;
         ImageView ivHeart;
-        TextView tvName, tvPrice, tvOriginalPrice, tvSaleBadge, tvDescription, tvBrand, tvRating;
+        TextView tvName, tvPrice, tvOriginalPrice, tvSaleBadge, tvDescription, tvBrand, tvRating, tvSoldOut;
+        View viewSoldOutOverlay;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -152,6 +166,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             tvBrand = itemView.findViewById(R.id.tvProductBrand);
             tvRating = itemView.findViewById(R.id.tvRating);
             ivHeart = itemView.findViewById(R.id.ivHeart);
+            tvSoldOut = itemView.findViewById(R.id.tvSoldOut);
+            viewSoldOutOverlay = itemView.findViewById(R.id.viewSoldOutOverlay);
         }
     }
 }

@@ -3,6 +3,7 @@ package com.example.shoppingapp.database.dao;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.example.shoppingapp.database.entity.Product;
 
@@ -12,6 +13,9 @@ import java.util.List;
 public interface ProductDao {
     @Insert
     void insert(Product product);
+
+    @Update
+    void update(Product product);
 
     @Query("SELECT * FROM products")
     List<Product> getAllProducts();
@@ -37,9 +41,6 @@ public interface ProductDao {
     @Query("SELECT * FROM products WHERE categoryId = :categoryId AND id != :excludeId LIMIT :limit")
     List<Product> getRelatedProducts(int categoryId, int excludeId, int limit);
 
-    @Query("SELECT * FROM products ORDER BY rating DESC LIMIT :limit")
-    List<Product> getTopRatedProducts(int limit);
-
-    @Query("SELECT * FROM products WHERE originalPrice > 0 AND originalPrice > price LIMIT :limit")
-    List<Product> getOnSaleProducts(int limit);
+    @Query("UPDATE products SET stockQuantity = stockQuantity - :quantity WHERE id = :productId")
+    void reduceStock(int productId, int quantity);
 }

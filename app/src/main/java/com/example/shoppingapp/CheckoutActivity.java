@@ -8,7 +8,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,12 +18,12 @@ import com.example.shoppingapp.database.entity.Order;
 import com.example.shoppingapp.database.entity.OrderDetail;
 import com.example.shoppingapp.database.entity.Product;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.text.NumberFormat;
 
 public class CheckoutActivity extends AppCompatActivity {
 
@@ -102,7 +101,6 @@ public class CheckoutActivity extends AppCompatActivity {
             paymentMethod = "COD";
         }
 
-        // Quy trình thanh toán luôn, không qua xác nhận đặt hàng nữa theo yêu cầu
         processOrder(address, paymentMethod);
     }
 
@@ -111,8 +109,30 @@ public class CheckoutActivity extends AppCompatActivity {
             Order order = db.orderDao().getOrderById(orderId);
             if (order == null) return;
             
-            // Trạng thái luôn là "Paid" sau khi thanh toán
-            order.setStatus("Paid");
+            // 0. Kiểm tra xem stock có đủ không
+            List<OrderDetail> details = db.orderDetailDao().getOrderDetailsByOrderId(orderId);
+            for (OrderDetail detail : details) {
+                Product product = db.productDao().getProductById(detail.getProductId());
+                if (product == null || product.getStockQuantity() < detail.getQuantity()) {
+                    runOnUiThread(() -> 
+                        Toast.makeText(this, "Một hoặc nhiều sản phẩm trong đơn hàng không đủ tồn kho. Vui lòng cập nhật giỏ hàng.", Toast.LENGTH_SHORT).show()
+                    );
+                    return;
+                }
+            }
+            
+            // 1. Giảm số lượng tồn kho của các sản phẩm trong đơn hàng
+            for (OrderDetail detail : details) {
+                db.productDao().reduceStock(detail.getProductId(), detail.getQuantity());
+            }
+
+            // 2. Cập nhật trạng thái đơn hàng
+            if (paymentMethod.equals("COD")) {
+                order.setStatus("Delivering");
+            } else {
+                order.setStatus("Paid");
+            }
+
             order.setAddress(address);
             order.setPaymentMethod(paymentMethod);
             db.orderDao().update(order);
