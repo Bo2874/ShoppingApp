@@ -38,7 +38,7 @@ public class RegisterActivity extends AppCompatActivity {
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
 
         Button btnRegister = findViewById(R.id.btnRegister);
-        TextView tvGoLogin = findViewById(R.id.tvLoginLink);
+        TextView tvGoLogin = findViewById(R.id.tvGoLogin);
 
         btnRegister.setOnClickListener(v -> attemptRegister());
         tvGoLogin.setOnClickListener(v -> finish());
