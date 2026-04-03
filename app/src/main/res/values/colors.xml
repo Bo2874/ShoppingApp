@@ -1,27 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary_dark">#1B2838</color>
-    <color name="primary">#2C3E50</color>
-    <color name="accent">#3498DB</color>
+    <color name="green_primary">#2E7D32</color>
+    <color name="green_dark">#1B5E20</color>
+    <color name="green_light">#C8E6C9</color>
+    <color name="green_bg">#E8F5E9</color>
     <color name="white">#FFFFFF</color>
-    <color name="black">#FF000000</color>
-    <color name="bg_light">#F8F9FA</color>
-    <color name="bg_card">#FFFFFF</color>
-    <color name="gray_bg">#F0F2F5</color>
-    <color name="gray_light">#E8ECF0</color>
-    <color name="gray_text">#8E9AAF</color>
-    <color name="gray_dark">#2D3436</color>
-    <color name="text_primary">#1A1A2E</color>
-    <color name="text_secondary">#636E72</color>
-    <color name="red_heart">#E74C3C</color>
-    <color name="red_price">#E74C3C</color>
-    <color name="star_yellow">#F39C12</color>
-    <color name="green_success">#27AE60</color>
-    <color name="orange_sale">#E67E22</color>
-    <!-- Legacy aliases -->
-    <color name="green_primary">#1B2838</color>
-    <color name="green_primary_dark">#0F1923</color>
-    <color name="green_accent">#3498DB</color>
-    <color name="green_light">#D6EAF8</color>
-    <color name="green_very_light">#EBF5FB</color>
+    <color name="black">#000000</color>
+    <color name="bg_light">#F5F5F5</color>
+    <color name="gray_light">#EEEEEE</color>
+    <color name="gray_text">#757575</color>
+    <color name="gray_dark">#424242</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="red_price">#D32F2F</color>
+    <color name="orange_sale">#FF9800</color>
 </resources>

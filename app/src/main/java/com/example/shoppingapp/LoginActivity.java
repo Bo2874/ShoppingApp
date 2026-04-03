@@ -29,37 +29,43 @@ public class LoginActivity extends AppCompatActivity {
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         Button btnLogin = findViewById(R.id.btnLogin);
-        TextView tvRegisterLink = findViewById(R.id.tvRegisterLink);
+        TextView tvGoRegister = findViewById(R.id.tvRegisterLink);
 
-        btnLogin.setOnClickListener(v -> doLogin());
+        btnLogin.setOnClickListener(v -> attemptLogin());
 
-        tvRegisterLink.setOnClickListener(v ->
+        tvGoRegister.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class)));
     }
 
-    private void doLogin() {
+    private void attemptLogin() {
         String username = etUsername.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        boolean hasError = false;
+        boolean valid = true;
 
         if (username.length() < 3) {
-            etUsername.setError("Tên đăng nhập phải có ít nhất 3 ký tự");
-            hasError = true;
+            etUsername.setError("Tên đăng nhập tối thiểu 3 ký tự");
+            valid = false;
         }
 
         if (password.length() < 6) {
-            etPassword.setError("Mật khẩu phải có ít nhất 6 ký tự");
-            hasError = true;
+            etPassword.setError("Mật khẩu tối thiểu 6 ký tự");
+            valid = false;
         }
 
-        if (hasError) return;
+        if (!valid) return;
 
         AppDatabase.databaseExecutor.execute(() -> {
             User user = db.userDao().login(username, password);
             runOnUiThread(() -> {
                 if (user != null) {
-                    sessionManager.createLoginSession(user.getId(), user.getUsername(), user.getFullName(), user.getEmail(), user.getPhone());
+                    sessionManager.createLoginSession(
+                            user.getId(),
+                            user.getUsername(),
+                            user.getFullName(),
+                            user.getPhone()
+                    );
+                    Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                     setResult(RESULT_OK);
                     finish();
                 } else {

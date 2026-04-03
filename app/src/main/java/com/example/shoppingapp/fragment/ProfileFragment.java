@@ -34,11 +34,9 @@ public class ProfileFragment extends Fragment {
     private AppDatabase db;
     private LinearLayout layoutNotLoggedIn;
     private ScrollView layoutLoggedIn;
-    private TextView tvProfileName, tvProfileUsername, tvProfileEmail, tvProfilePhone, tvNoOrders;
-    private TextView chipAll, chipDelivering, chipPaid;
+    private TextView tvProfileName, tvProfileUsername, tvProfilePhone, tvNoOrders;
     private OrderHistoryAdapter orderAdapter;
     private final List<Order> orders = new ArrayList<>();
-    private String currentFilter = "all";
 
     private final ActivityResultLauncher<Intent> loginLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -61,18 +59,8 @@ public class ProfileFragment extends Fragment {
         layoutLoggedIn = view.findViewById(R.id.layoutLoggedIn);
         tvProfileName = view.findViewById(R.id.tvProfileName);
         tvProfileUsername = view.findViewById(R.id.tvProfileUsername);
-        tvProfileEmail = view.findViewById(R.id.tvProfileEmail);
         tvProfilePhone = view.findViewById(R.id.tvProfilePhone);
         tvNoOrders = view.findViewById(R.id.tvNoOrders);
-
-        // Filter chips
-        chipAll = view.findViewById(R.id.chipAll);
-        chipDelivering = view.findViewById(R.id.chipDelivering);
-        chipPaid = view.findViewById(R.id.chipPaid);
-
-        chipAll.setOnClickListener(v -> selectFilter("all"));
-        chipDelivering.setOnClickListener(v -> selectFilter("Delivering"));
-        chipPaid.setOnClickListener(v -> selectFilter("Paid"));
 
         view.findViewById(R.id.btnGoLogin).setOnClickListener(v ->
                 loginLauncher.launch(new Intent(requireContext(), LoginActivity.class)));
@@ -98,24 +86,6 @@ public class ProfileFragment extends Fragment {
         updateUI();
     }
 
-    private void selectFilter(String filter) {
-        currentFilter = filter;
-        // Reset all chips
-        TextView[] chips = {chipAll, chipDelivering, chipPaid};
-        for (TextView chip : chips) {
-            chip.setBackgroundResource(R.drawable.bg_chip_normal);
-            chip.setTextColor(getResources().getColor(R.color.gray_dark, null));
-        }
-        // Highlight selected
-        TextView selected;
-        if (filter.equals("Delivering")) selected = chipDelivering;
-        else if (filter.equals("Paid")) selected = chipPaid;
-        else selected = chipAll;
-        selected.setBackgroundResource(R.drawable.bg_chip_selected);
-        selected.setTextColor(getResources().getColor(R.color.white, null));
-        loadOrderHistory();
-    }
-
     private void updateUI() {
         if (sessionManager.isLoggedIn()) {
             layoutNotLoggedIn.setVisibility(View.GONE);
@@ -123,11 +93,6 @@ public class ProfileFragment extends Fragment {
             tvProfileName.setText(sessionManager.getFullName());
             tvProfileUsername.setText("@" + sessionManager.getUsername());
 
-            String email = sessionManager.getEmail();
-            if (email != null && !email.isEmpty()) {
-                tvProfileEmail.setText(email);
-                tvProfileEmail.setVisibility(View.VISIBLE);
-            }
             String phone = sessionManager.getPhone();
             if (phone != null && !phone.isEmpty()) {
                 tvProfilePhone.setText(phone);
@@ -143,12 +108,7 @@ public class ProfileFragment extends Fragment {
 
     private void loadOrderHistory() {
         AppDatabase.databaseExecutor.execute(() -> {
-            List<Order> result;
-            if (currentFilter.equals("all")) {
-                result = db.orderDao().getCompletedOrders(sessionManager.getUserId());
-            } else {
-                result = db.orderDao().getOrdersByStatus(sessionManager.getUserId(), currentFilter);
-            }
+            List<Order> result = db.orderDao().getPaidOrders(sessionManager.getUserId());
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> {
                     orders.clear();

@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -28,13 +27,9 @@ public class ProductListActivity extends AppCompatActivity {
     private final List<Product> products = new ArrayList<>();
     private List<Product> allProducts = new ArrayList<>();
     private AppDatabase db;
-    private SessionManager sessionManager;
     private int categoryId = -1;
     private TextView tvEmptyResult;
-    private RecyclerView rv;
     private SwipeRefreshLayout swipeRefresh;
-    private ImageButton btnToggleView;
-    private boolean isGridView = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +37,6 @@ public class ProductListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_product_list);
 
         db = AppDatabase.getInstance(this);
-        sessionManager = new SessionManager(this);
 
         categoryId = getIntent().getIntExtra("categoryId", -1);
         String categoryName = getIntent().getStringExtra("categoryName");
@@ -59,11 +53,7 @@ public class ProductListActivity extends AppCompatActivity {
         ImageButton btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
-        // Grid/List toggle
-        btnToggleView = findViewById(R.id.btnToggleView);
-        btnToggleView.setOnClickListener(v -> toggleViewType());
-
-        rv = findViewById(R.id.rvProducts);
+        RecyclerView rv = findViewById(R.id.rvProducts);
         rv.setLayoutManager(new GridLayoutManager(this, 2));
         adapter = new ProductAdapter(products, product -> {
             Intent intent = new Intent(this, ProductDetailActivity.class);
@@ -93,36 +83,6 @@ public class ProductListActivity extends AppCompatActivity {
         loadProducts();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadFavorites();
-    }
-
-    private void loadFavorites() {
-        if (!sessionManager.isLoggedIn()) {
-            adapter.setFavoriteProductIds(new ArrayList<>());
-            return;
-        }
-        AppDatabase.databaseExecutor.execute(() -> {
-            List<Integer> favoriteIds = db.favoriteDao().getFavoriteProductIds(sessionManager.getUserId());
-            runOnUiThread(() -> adapter.setFavoriteProductIds(favoriteIds));
-        });
-    }
-
-    private void toggleViewType() {
-        isGridView = !isGridView;
-        if (isGridView) {
-            rv.setLayoutManager(new GridLayoutManager(this, 2));
-            btnToggleView.setImageResource(R.drawable.ic_list);
-            adapter.setViewType(ProductAdapter.VIEW_TYPE_GRID);
-        } else {
-            rv.setLayoutManager(new LinearLayoutManager(this));
-            btnToggleView.setImageResource(R.drawable.ic_grid);
-            adapter.setViewType(ProductAdapter.VIEW_TYPE_LIST);
-        }
-    }
-
     private void loadProducts() {
         AppDatabase.databaseExecutor.execute(() -> {
             List<Product> result;
@@ -149,30 +109,33 @@ public class ProductListActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
             updateEmptyState();
         } else {
-            // Search from DB to get results across all products
-            AppDatabase.databaseExecutor.execute(() -> {
-                List<Product> result;
-                if (categoryId > 0) {
-                    // Filter within category locally
-                    String lowerQuery = query.toLowerCase();
-                    result = new ArrayList<>();
-                    for (Product p : allProducts) {
-                        if (p.getName().toLowerCase().contains(lowerQuery)
-                                || (p.getBrand() != null && p.getBrand().toLowerCase().contains(lowerQuery))
-                                || p.getDescription().toLowerCase().contains(lowerQuery)) {
-                            result.add(p);
-                        }
-                    }
-                } else {
-                    result = db.productDao().searchProducts(query);
+            // Local filter first
+            String lowerQuery = query.toLowerCase();
+            List<Product> filtered = new ArrayList<>();
+            for (Product p : allProducts) {
+                if (p.getName().toLowerCase().contains(lowerQuery)
+                        || p.getDescription().toLowerCase().contains(lowerQuery)) {
+                    filtered.add(p);
                 }
-                runOnUiThread(() -> {
-                    products.clear();
-                    products.addAll(result);
-                    adapter.notifyDataSetChanged();
-                    updateEmptyState();
+            }
+
+            if (filtered.isEmpty()) {
+                // Fallback to DB search
+                AppDatabase.databaseExecutor.execute(() -> {
+                    List<Product> result = db.productDao().searchProducts(query);
+                    runOnUiThread(() -> {
+                        products.clear();
+                        products.addAll(result);
+                        adapter.notifyDataSetChanged();
+                        updateEmptyState();
+                    });
                 });
-            });
+            } else {
+                products.clear();
+                products.addAll(filtered);
+                adapter.notifyDataSetChanged();
+                updateEmptyState();
+            }
         }
     }
 

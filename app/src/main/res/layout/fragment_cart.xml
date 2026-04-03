@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray_bg"
+    android:background="@color/bg_light"
     android:orientation="vertical">
 
     <!-- Header -->
@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/nav_cart"
+            android:text="Giỏ hàng"
             android:textColor="@color/white"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -34,13 +34,14 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:alpha="0.4"
-            android:src="@drawable/ic_cart" />
+            android:src="@drawable/ic_cart"
+            android:contentDescription="Empty cart" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/cart_empty"
+            android:text="Giỏ hàng trống"
             android:textColor="@color/gray_text"
             android:textSize="16sp" />
 
@@ -93,7 +94,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/total"
+                    android:text="Tổng cộng:"
                     android:textColor="@color/gray_dark"
                     android:textSize="16sp" />
 
@@ -116,7 +117,7 @@
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_button_green"
                 android:gravity="center"
-                android:text="@string/checkout"
+                android:text="Thanh toán"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold" />

@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Chi tiết đơn hàng"
+            android:text="Hóa đơn"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -104,6 +104,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="10dp"
                         android:orientation="horizontal">
+
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -111,6 +112,7 @@
                             android:text="Ngày đặt"
                             android:textColor="@color/gray_text"
                             android:textSize="13sp" />
+
                         <TextView
                             android:id="@+id/tvInvoiceDate"
                             android:layout_width="wrap_content"
@@ -124,6 +126,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="10dp"
                         android:orientation="horizontal">
+
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -131,6 +134,7 @@
                             android:text="Khách hàng"
                             android:textColor="@color/gray_text"
                             android:textSize="13sp" />
+
                         <TextView
                             android:id="@+id/tvInvoiceCustomer"
                             android:layout_width="wrap_content"
@@ -146,6 +150,7 @@
                         android:layout_marginBottom="10dp"
                         android:orientation="horizontal"
                         android:visibility="gone">
+
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -153,75 +158,9 @@
                             android:text="Số điện thoại"
                             android:textColor="@color/gray_text"
                             android:textSize="13sp" />
+
                         <TextView
                             android:id="@+id/tvInvoicePhone"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/text_primary"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/rowEmail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:orientation="horizontal"
-                        android:visibility="gone">
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Email"
-                            android:textColor="@color/gray_text"
-                            android:textSize="13sp" />
-                        <TextView
-                            android:id="@+id/tvInvoiceEmail"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/text_primary"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/rowAddress"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:orientation="horizontal"
-                        android:visibility="gone">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Địa chỉ"
-                            android:layout_marginEnd="16dp"
-                            android:textColor="@color/gray_text"
-                            android:textSize="13sp" />
-                        <TextView
-                            android:id="@+id/tvInvoiceAddress"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:textColor="@color/text_primary"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/rowPayment"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:visibility="gone">
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Thanh toán"
-                            android:textColor="@color/gray_text"
-                            android:textSize="13sp" />
-                        <TextView
-                            android:id="@+id/tvInvoicePayment"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/text_primary"
@@ -295,36 +234,21 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Buttons -->
+    <!-- Bottom Button -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:elevation="8dp"
-        android:orientation="horizontal"
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/btnReorder"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_button_outline"
-            android:gravity="center"
-            android:text="@string/reorder"
-            android:textColor="@color/text_primary"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
-        <TextView
             android:id="@+id/btnBackHome"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_button_dark"
+            android:background="@drawable/bg_button_green"
             android:gravity="center"
-            android:text="@string/back_home"
+            android:text="Về trang chủ"
             android:textColor="@color/white"
             android:textSize="15sp"
             android:textStyle="bold" />

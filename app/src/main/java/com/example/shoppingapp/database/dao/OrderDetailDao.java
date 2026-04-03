@@ -23,7 +23,7 @@ public interface OrderDetailDao {
     OrderDetail getOrderDetail(int orderId, int productId);
 
     @Query("UPDATE order_details SET quantity = quantity + :quantity WHERE id = :id")
-    void updateQuantity(int id, int quantity);
+    void addQuantity(int id, int quantity);
 
     @Query("UPDATE order_details SET quantity = :quantity WHERE id = :id")
     void setQuantity(int id, int quantity);

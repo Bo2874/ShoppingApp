@@ -10,7 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.shoppingapp.R;
 import com.example.shoppingapp.database.entity.Category;
 
@@ -20,7 +19,7 @@ public class HomeCategoryAdapter extends RecyclerView.Adapter<HomeCategoryAdapte
 
     private final List<Category> categories;
     private final OnCategoryClickListener listener;
-    private int selectedPosition = 0;
+    private int selectedPosition = -1;
 
     public interface OnCategoryClickListener {
         void onCategoryClick(Category category);
@@ -44,20 +43,6 @@ public class HomeCategoryAdapter extends RecyclerView.Adapter<HomeCategoryAdapte
         Category category = categories.get(position);
         Context context = holder.itemView.getContext();
         holder.tvName.setText(category.getName());
-
-        // Logic load ảnh từ resource string
-        Object imageSource = category.getImageUrl();
-        if (category.getImageUrl() != null && category.getImageUrl().startsWith("res://drawable/")) {
-            String resName = category.getImageUrl().replace("res://drawable/", "");
-            int resId = context.getResources().getIdentifier(resName, "drawable", context.getPackageName());
-            if (resId != 0) imageSource = resId;
-        }
-
-        Glide.with(context)
-                .load(imageSource)
-                .placeholder(R.drawable.ic_category)
-                .error(R.drawable.ic_category)
-                .into(holder.ivIcon);
 
         if (position == selectedPosition) {
             holder.itemView.setBackgroundResource(R.drawable.bg_category_chip_selected);

@@ -23,17 +23,8 @@ public interface OrderDao {
     @Query("SELECT * FROM orders WHERE id = :id LIMIT 1")
     Order getOrderById(int id);
 
-    @Query("SELECT * FROM orders WHERE userId = :userId")
-    List<Order> getOrdersByUser(int userId);
-
     @Query("SELECT * FROM orders WHERE userId = :userId AND status = 'Paid' ORDER BY orderDate DESC")
     List<Order> getPaidOrders(int userId);
-
-    @Query("SELECT * FROM orders WHERE userId = :userId AND status NOT IN ('Pending', 'BuyNow') ORDER BY orderDate DESC")
-    List<Order> getCompletedOrders(int userId);
-
-    @Query("SELECT * FROM orders WHERE userId = :userId AND status = :status ORDER BY orderDate DESC")
-    List<Order> getOrdersByStatus(int userId, String status);
 
     @Query("DELETE FROM orders WHERE id = :id")
     void deleteById(int id);
