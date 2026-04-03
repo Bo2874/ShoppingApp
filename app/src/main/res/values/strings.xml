@@ -1,10 +1,10 @@
 <resources>
-    <string name="app_name">ShoeStore</string>
+    <string name="app_name">FruitApp</string>
     <string name="nav_home">Khám phá</string>
     <string name="nav_favorite">Yêu thích</string>
     <string name="nav_cart">Giỏ hàng</string>
     <string name="nav_profile">Tài khoản</string>
-    <string name="search_hint">Tìm kiếm giày…</string>
+    <string name="search_hint">Tìm hoa quả tươi…</string>
     <string name="banner_title">Giảm 50% đơn đầu tiên</string>
     <string name="shop_now">Mua ngay</string>
     <string name="categories_title">Danh mục</string>
@@ -39,7 +39,7 @@
     <string name="all_orders">Tất cả</string>
     <string name="filter_paid">Đã thanh toán</string>
     <string name="address_hint">Nhập địa chỉ giao hàng…</string>
-    <string name="select_size">Chọn size</string>
+    <string name="select_size">Chọn loại</string>
     <string name="description">Mô tả</string>
     <string name="reviews">Đánh giá</string>
     <string name="no_account">Chưa có tài khoản?</string>
@@ -48,6 +48,6 @@
     <string name="clear_history">Xóa</string>
     <string name="quantity">Số lượng</string>
     <string name="added_to_cart_update">Đã cập nhật giỏ hàng!</string>
-    <string name="explore">Explore</string>
+    <string name="explore">Khám phá</string>
     <string name="favorite_empty">Chưa có sản phẩm yêu thích</string>
 </resources>
